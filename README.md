@@ -45,8 +45,9 @@ Now the CPU will be available inside computer.circ.
 
 Clone the repository:
 
+```bash
 git clone https://github.com/Goku144/CPU-Design-in-Logisim.git
-
+```
 
 Open computer.circ in Logisim (custom version included).
 
