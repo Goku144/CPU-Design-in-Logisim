@@ -79,10 +79,12 @@ I extended the concepts by implementing them in a customized version of Logisim,
 
 To build the computer, I followed a layered abstraction approach:
 
-At the very bottom level, I experimented with constructing NAND gates from PMOS and NMOS transistors, to understand the hardware foundations of digital logic.
+At the very bottom, I experimented with constructing NAND gates from PMOS and NMOS transistors, to understand the hardware foundations of logic.
 
-On top of that, I built higher-order components (combinational logic, sequential elements, ALU, etc.) strictly from NAND gates, verifying correctness at each stage.
+Using these NAND gates, I implemented all of the elementary building blocks (gates, registers, multiplexers, demultiplexers, etc.), verifying that they worked exactly as expected.
 
-Once these components worked as expected, I gradually abstracted them into higher-level blocks, and in later stages replaced them with Logisim’s built-in chips for the sake of performance and usability.
+Once validated, I replaced only these low-level building blocks with their Logisim built-in equivalents, in order to improve performance and usability in larger designs.
 
-This way, the CPU is both a faithful low-level design (starting all the way from transistor logic) and a practical tool that can run Hack assembly programs with visible graphics and keyboard input.
+From there, I used those primitives to construct higher-level units such as the ALU, memory, and ultimately the CPU.
+
+This approach kept the design faithful to its low-level origins while making it practical to simulate complex programs, so the final CPU can actually run Hack assembly with graphics and keyboard input.
