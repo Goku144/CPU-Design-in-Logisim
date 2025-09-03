@@ -84,7 +84,10 @@
       <a name="addrWidth" val="16"/>
       <a name="appearance" val="classic"/>
       <a name="contents">addr/data: 16 16
-0
+0 fc10 17 e306 10 e308 4000 ec10
+11 e308 11 fc20 ee88 11 fc10 20
+e090 11 e308 10 fc98 a e301 17
+ea87
 </a>
       <a name="dataWidth" val="16"/>
       <a name="label" val="Instructions"/>
@@ -98,6 +101,7 @@
       <a name="buflen" val="1"/>
     </comp>
     <comp lib="5" loc="(1710,1450)" name="RGB Video">
+      <a name="cursor" val="No Cursor"/>
       <a name="height" val="256"/>
       <a name="width" val="512"/>
       <a name="writemode" val="Packed 16 (1bpp)"/>
@@ -180,12 +184,12 @@
       <polyline fill="none" points="150,180 150,199" stroke="#000000"/>
       <polyline fill="none" points="130,160 110,160" stroke="#000000"/>
       <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="150" y="159">SM</text>
-      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="168" y="130">@</text>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="170" y="129">@</text>
       <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="130" y="132">W</text>
       <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="180" y="150">PX</text>
       <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="180" y="170">PY</text>
-      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="171" y="190">WS</text>
-      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="130" y="188">SK</text>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="170" y="190">WS</text>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="130" y="189">SK</text>
       <circ-anchor facing="east" x="190" y="150"/>
       <circ-port dir="in" pin="1070,2120" x="170" y="120"/>
       <circ-port dir="in" pin="1230,2140" x="130" y="120"/>
