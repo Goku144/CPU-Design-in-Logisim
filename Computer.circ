@@ -26,7 +26,7 @@
   <lib desc="#Input/Output-Extra" name="10"/>
   <lib desc="#Soc" name="11"/>
   <lib desc="file#Hardware\CPU\CPU.circ" name="12"/>
-  <main name="computer"/>
+  <main name="Computer"/>
   <options>
     <a name="gateUndefined" val="ignore"/>
     <a name="simlimit" val="1000"/>
@@ -59,55 +59,138 @@
     <tool lib="4" name="D Flip-Flop"/>
     <tool lib="4" name="Register"/>
   </toolbar>
-  <circuit name="computer">
+  <circuit name="Computer">
     <a name="appearance" val="logisim_evolution"/>
-    <a name="circuit" val="computer"/>
+    <a name="circuit" val="Computer"/>
     <a name="circuitnamedboxfixedsize" val="true"/>
     <a name="simulationFrequency" val="64.0"/>
-    <comp lib="0" loc="(660,550)" name="Pin">
+    <comp lib="0" loc="(1140,1770)" name="Clock">
       <a name="appearance" val="NewPins"/>
-      <a name="facing" val="south"/>
     </comp>
-    <comp lib="12" loc="(760,610)" name="CPU"/>
-    <comp lib="4" loc="(410,550)" name="ROM">
+    <comp lib="12" loc="(1170,1480)" name="CPU"/>
+    <comp lib="2" loc="(1520,1690)" name="Multiplexer">
+      <a name="selloc" val="tr"/>
+      <a name="width" val="16"/>
+    </comp>
+    <comp lib="4" loc="(1230,1620)" name="RAM">
+      <a name="addrWidth" val="15"/>
+      <a name="appearance" val="classic"/>
+      <a name="clearpin" val="true"/>
+      <a name="dataWidth" val="16"/>
+      <a name="enables" val="line"/>
+      <a name="label" val="DATA"/>
+    </comp>
+    <comp lib="4" loc="(820,1420)" name="ROM">
       <a name="addrWidth" val="16"/>
       <a name="appearance" val="classic"/>
       <a name="contents">addr/data: 16 16
-6fff ee88
+0
 </a>
       <a name="dataWidth" val="16"/>
+      <a name="label" val="Instructions"/>
     </comp>
-    <wire from="(400,560)" to="(400,700)"/>
-    <wire from="(400,560)" to="(410,560)"/>
-    <wire from="(400,700)" to="(770,700)"/>
-    <wire from="(650,610)" to="(680,610)"/>
-    <wire from="(660,550)" to="(660,670)"/>
-    <wire from="(660,670)" to="(680,670)"/>
-    <wire from="(670,640)" to="(670,710)"/>
-    <wire from="(670,640)" to="(680,640)"/>
-    <wire from="(670,710)" to="(680,710)"/>
-    <wire from="(760,610)" to="(770,610)"/>
-    <wire from="(760,630)" to="(770,630)"/>
-    <wire from="(760,650)" to="(780,650)"/>
-    <wire from="(760,670)" to="(770,670)"/>
-    <wire from="(770,670)" to="(770,700)"/>
-    <wire from="(780,650)" to="(780,720)"/>
+    <comp lib="5" loc="(1070,1410)" name="Button">
+      <a name="facing" val="south"/>
+      <a name="label" val="Reset"/>
+      <a name="labelloc" val="north"/>
+    </comp>
+    <comp lib="5" loc="(1320,1770)" name="Keyboard">
+      <a name="buflen" val="1"/>
+    </comp>
+    <comp lib="5" loc="(1710,1460)" name="RGB Video">
+      <a name="height" val="256"/>
+      <a name="width" val="512"/>
+      <a name="writemode" val="Packed 16 (1bpp)"/>
+    </comp>
+    <comp loc="(1560,1560)" name="SM"/>
+    <wire from="(1060,1480)" to="(1090,1480)"/>
+    <wire from="(1070,1410)" to="(1070,1460)"/>
+    <wire from="(1070,1460)" to="(1070,1540)"/>
+    <wire from="(1070,1460)" to="(1180,1460)"/>
+    <wire from="(1070,1540)" to="(1090,1540)"/>
+    <wire from="(1080,1510)" to="(1080,1800)"/>
+    <wire from="(1080,1510)" to="(1090,1510)"/>
+    <wire from="(1080,1800)" to="(1530,1800)"/>
+    <wire from="(1140,1770)" to="(1220,1770)"/>
+    <wire from="(1170,1480)" to="(1190,1480)"/>
+    <wire from="(1170,1500)" to="(1210,1500)"/>
+    <wire from="(1170,1520)" to="(1200,1520)"/>
+    <wire from="(1170,1540)" to="(1180,1540)"/>
+    <wire from="(1180,1460)" to="(1180,1470)"/>
+    <wire from="(1180,1470)" to="(1270,1470)"/>
+    <wire from="(1180,1540)" to="(1180,1570)"/>
+    <wire from="(1190,1480)" to="(1190,1680)"/>
+    <wire from="(1190,1480)" to="(1770,1480)"/>
+    <wire from="(1190,1680)" to="(1230,1680)"/>
+    <wire from="(1200,1520)" to="(1200,1650)"/>
+    <wire from="(1200,1520)" to="(1500,1520)"/>
+    <wire from="(1200,1650)" to="(1230,1650)"/>
+    <wire from="(1210,1500)" to="(1210,1630)"/>
+    <wire from="(1210,1500)" to="(1540,1500)"/>
+    <wire from="(1210,1630)" to="(1230,1630)"/>
+    <wire from="(1220,1510)" to="(1220,1660)"/>
+    <wire from="(1220,1510)" to="(1720,1510)"/>
+    <wire from="(1220,1660)" to="(1220,1770)"/>
+    <wire from="(1220,1660)" to="(1230,1660)"/>
+    <wire from="(1220,1770)" to="(1320,1770)"/>
+    <wire from="(1270,1470)" to="(1270,1620)"/>
+    <wire from="(1270,1470)" to="(1710,1470)"/>
+    <wire from="(1330,1780)" to="(1330,1810)"/>
+    <wire from="(1330,1810)" to="(1540,1810)"/>
+    <wire from="(1460,1780)" to="(1460,1790)"/>
+    <wire from="(1460,1790)" to="(1480,1790)"/>
+    <wire from="(1470,1680)" to="(1490,1680)"/>
+    <wire from="(1480,1700)" to="(1480,1790)"/>
+    <wire from="(1480,1700)" to="(1490,1700)"/>
+    <wire from="(1500,1520)" to="(1500,1530)"/>
+    <wire from="(1500,1610)" to="(1500,1650)"/>
+    <wire from="(1500,1650)" to="(1500,1670)"/>
+    <wire from="(1500,1650)" to="(1540,1650)"/>
+    <wire from="(1520,1690)" to="(1530,1690)"/>
+    <wire from="(1530,1690)" to="(1530,1800)"/>
+    <wire from="(1540,1500)" to="(1540,1530)"/>
+    <wire from="(1540,1650)" to="(1540,1810)"/>
+    <wire from="(1560,1560)" to="(1750,1560)"/>
+    <wire from="(1560,1580)" to="(1760,1580)"/>
+    <wire from="(1560,1600)" to="(1730,1600)"/>
+    <wire from="(1710,1460)" to="(1710,1470)"/>
+    <wire from="(1720,1460)" to="(1720,1510)"/>
+    <wire from="(1730,1460)" to="(1730,1600)"/>
+    <wire from="(1750,1460)" to="(1750,1560)"/>
+    <wire from="(1760,1460)" to="(1760,1580)"/>
+    <wire from="(1770,1460)" to="(1770,1480)"/>
+    <wire from="(810,1430)" to="(810,1570)"/>
+    <wire from="(810,1430)" to="(820,1430)"/>
+    <wire from="(810,1570)" to="(1180,1570)"/>
   </circuit>
   <circuit name="SM">
-    <a name="appearance" val="logisim_evolution"/>
+    <a name="appearance" val="custom"/>
     <a name="circuit" val="SM"/>
     <a name="circuitnamedboxfixedsize" val="true"/>
     <a name="simulationFrequency" val="3.2768E7"/>
     <appear>
-      <rect fill="none" height="73" stroke="#000000" width="74" x="104" y="114"/>
-      <rect fill="none" height="73" stroke="#000000" width="74" x="170" y="250"/>
-      <circ-anchor facing="east" x="270" y="60"/>
-      <circ-port dir="in" pin="1070,2120" x="50" y="60"/>
-      <circ-port dir="in" pin="1230,2140" x="50" y="70"/>
-      <circ-port dir="out" pin="1140,2270" x="270" y="70"/>
-      <circ-port dir="out" pin="1330,2210" x="270" y="60"/>
-      <circ-port dir="out" pin="1370,2330" x="270" y="80"/>
-      <circ-port dir="out" pin="1450,2330" x="270" y="90"/>
+      <rect fill="none" height="80" stroke="#000000" width="80" x="110" y="120"/>
+      <rect fill="none" height="40" stroke="#000000" width="40" x="130" y="140"/>
+      <polyline fill="none" points="150,120 150,140" stroke="#000000"/>
+      <polyline fill="none" points="170,140 190,140" stroke="#000000"/>
+      <polyline fill="none" points="170,160 190,160" stroke="#000000"/>
+      <polyline fill="none" points="170,180 190,180" stroke="#000000"/>
+      <polyline fill="none" points="150,180 150,199" stroke="#000000"/>
+      <polyline fill="none" points="130,160 110,160" stroke="#000000"/>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="150" y="159">SM</text>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="168" y="130">@</text>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="130" y="132">W</text>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="180" y="150">PX</text>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="180" y="170">PY</text>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="171" y="190">WS</text>
+      <text dominant-baseline="central" font-family="SansSerif" font-size="12" text-anchor="middle" x="130" y="188">SK</text>
+      <circ-anchor facing="east" x="190" y="150"/>
+      <circ-port dir="in" pin="1070,2120" x="170" y="120"/>
+      <circ-port dir="in" pin="1230,2140" x="130" y="120"/>
+      <circ-port dir="out" pin="1140,2380" x="130" y="200"/>
+      <circ-port dir="out" pin="1330,2210" x="190" y="190"/>
+      <circ-port dir="out" pin="1370,2330" x="190" y="170"/>
+      <circ-port dir="out" pin="1450,2330" x="190" y="150"/>
     </appear>
     <comp lib="0" loc="(1040,2210)" name="Constant">
       <a name="value" val="0x4000"/>
@@ -124,7 +207,7 @@
       <a name="radix" val="16"/>
       <a name="width" val="15"/>
     </comp>
-    <comp lib="0" loc="(1140,2270)" name="Pin">
+    <comp lib="0" loc="(1140,2380)" name="Pin">
       <a name="appearance" val="NewPins"/>
       <a name="facing" val="north"/>
       <a name="label" val="SelKeyBoard"/>
@@ -246,7 +329,7 @@
     <wire from="(1120,2350)" to="(1220,2350)"/>
     <wire from="(1130,2180)" to="(1130,2190)"/>
     <wire from="(1130,2180)" to="(1140,2180)"/>
-    <wire from="(1140,2250)" to="(1140,2270)"/>
+    <wire from="(1140,2250)" to="(1140,2380)"/>
     <wire from="(1140,2250)" to="(1150,2250)"/>
     <wire from="(1170,2190)" to="(1190,2190)"/>
     <wire from="(1170,2250)" to="(1190,2250)"/>
