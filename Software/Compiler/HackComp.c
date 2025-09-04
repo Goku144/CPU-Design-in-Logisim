@@ -102,9 +102,10 @@ void *removeDoubleLinkedListNode(DoubleLinkedList *list)
         list->size--;
         return data;
     }
-    free(list->tail);
-    list->tail= list->tail->prev;
-    list->tail->next = NULL;
+    DoubleNode *old = list->tail;     // save before free
+    list->tail = old->prev;           // move tail back (non-NULL since size > 1)
+    list->tail->next = NULL;          // terminate list
+    free(old);                        // free after relinking
     list->size--;
     return data;
 }
@@ -128,16 +129,18 @@ void freeLinkedList(LinkedList *list)
 
 void freeDoubleLinkedList(DoubleLinkedList *list)
 {
-    DoubleNode *newNode = list->head;
-        while (newNode)
-        {
-        free(newNode);
-        list->head = list->head->next;
-        newNode = list->head;
-        list->size--;
-        }
+    if (!list) return;
+    DoubleNode *cur = list->head;
+    while (cur) {
+        DoubleNode *next = cur->next; 
+        free(cur);                     
+        cur = next;                   
+        if (list->size > 0) list->size--;
+    }
+    list->head = list->tail = NULL;
     free(list);
 }
+
 
 void destroyStack(Stack *stack){
     freeDoubleLinkedList(stack);

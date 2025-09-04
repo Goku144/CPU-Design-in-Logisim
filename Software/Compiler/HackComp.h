@@ -14,7 +14,6 @@ struct __DoubleNode__
     void *data;
     struct __DoubleNode__ *next;
     struct __DoubleNode__ *prev;
-    size_t bytes;
 };
 
 struct __LinkedList__
@@ -42,6 +41,7 @@ LinkedList *createNewLinkedList();
 DoubleLinkedList *createNewDoubleLinkedList();
 
 Stack *createNewStack();
+
 void addLinkedListNode(LinkedList *list, void *data);
 
 void addDoubleLinkedListNode(DoubleLinkedList *list, void *data);
@@ -59,6 +59,5 @@ void freeLinkedList(LinkedList *list);
 void freeDoubleLinkedList(DoubleLinkedList *list);
 
 void destroyStack(Stack *stack);
-
 
 #endif // __DATA_STRUCTURE__
