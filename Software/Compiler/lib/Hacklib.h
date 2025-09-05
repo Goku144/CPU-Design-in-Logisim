@@ -1,24 +1,27 @@
-#include<stdio.h>
+#include <stdio.h>
 
 #if !defined(__DATA_STRUCTURE__)
 #define __DATA_STRUCTURE__
 
 /*************************** struct def ***************************/
 
-struct __FILE_INFO__{
-    FILE *fp;
-    size_t size;
+struct __FILE_INFO__
+{
+    char *fp;
+    long size;
 };
 
-struct __Block__{
+struct __Block__
+{
     void *data;
     struct __Block__ *next;
     struct __Block__ *prev;
 };
 
-struct __LinearBlock__{
+struct __LinearBlock__
+{
     struct __Block__ *bottom; // bottom is the head
-    struct __Block__ *top; // top is the tail
+    struct __Block__ *top;    // top is the tail
     size_t size;
 };
 
@@ -30,6 +33,8 @@ typedef struct __LinearBlock__ Stack;
 typedef struct __LinearBlock__ Queu;
 
 /**************************** func def ****************************/
+
+FILE_INFO extF(char *path);
 
 Stack *newStack(void);
 

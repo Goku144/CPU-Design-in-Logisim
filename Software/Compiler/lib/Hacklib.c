@@ -3,7 +3,42 @@
 #include <string.h>
 #include "Hacklib.h"
 
-Stack *newStack(void){
+/***************** I/O *****************/
+
+FILE_INFO extF(char *path)
+{
+    FILE *fp = fopen(path, "rb");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "fopen: Can't open the file");
+        return (FILE_INFO){NULL, 0};
+    }
+
+    fseek(fp, 0, SEEK_END);
+    long size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    char *buffer = malloc(size + 1);
+    if (buffer == NULL)
+    {
+        fprintf(stderr, "malloc: Can't allocate space");
+        return (FILE_INFO){NULL, 0};
+    }
+
+    if (fread(buffer, 1, size, fp) < (size_t)size)
+    {
+        fprintf(stderr, "fread: Can't read all the file");
+        return (FILE_INFO){NULL, 0};
+    }
+
+    buffer[size] = '\0';
+    fclose(fp);
+    return (FILE_INFO){buffer, size};
+}
+
+/*********** Data Structure ***********/
+Stack *newStack(void)
+{
     Stack *stack = malloc(sizeof *stack);
     stack->bottom = NULL;
     stack->top = NULL;
@@ -11,7 +46,8 @@ Stack *newStack(void){
     return stack;
 }
 
-Queu *newQueu(void){
+Queu *newQueu(void)
+{
     Queu *queu = malloc(sizeof *queu);
     queu->bottom = NULL;
     queu->top = NULL;
@@ -19,8 +55,10 @@ Queu *newQueu(void){
     return queu;
 }
 
-void push(Stack *stack, void *data){
-    if(!stack){
+void push(Stack *stack, void *data)
+{
+    if (!stack)
+    {
         fprintf(stderr, "Stack is already gone\n");
         return;
     }
@@ -28,9 +66,12 @@ void push(Stack *stack, void *data){
     newBlock->data = data;
     newBlock->next = NULL;
     newBlock->prev = NULL;
-    if(stack->bottom == NULL){
-        stack->top = stack->bottom = newBlock; 
-    }else{
+    if (stack->bottom == NULL)
+    {
+        stack->top = stack->bottom = newBlock;
+    }
+    else
+    {
         stack->top->next = newBlock;
         newBlock->prev = stack->top;
         stack->top = newBlock;
@@ -38,8 +79,10 @@ void push(Stack *stack, void *data){
     stack->size++;
 }
 
-void enqueu(Queu *queu, void *data){
-    if(!queu){
+void enqueu(Queu *queu, void *data)
+{
+    if (!queu)
+    {
         fprintf(stderr, "Queu is already gone\n");
         return;
     }
@@ -47,9 +90,12 @@ void enqueu(Queu *queu, void *data){
     newBlock->data = data;
     newBlock->next = NULL;
     newBlock->prev = NULL;
-    if(queu->bottom == NULL){
-        queu->top = queu->bottom = newBlock; 
-    }else{
+    if (queu->bottom == NULL)
+    {
+        queu->top = queu->bottom = newBlock;
+    }
+    else
+    {
         queu->top->next = newBlock;
         newBlock->prev = queu->top;
         queu->top = newBlock;
@@ -57,20 +103,26 @@ void enqueu(Queu *queu, void *data){
     queu->size++;
 }
 
-void *pop(Stack *stack){
-    if(!stack){
+void *pop(Stack *stack)
+{
+    if (!stack)
+    {
         fprintf(stderr, "Stack is already gone\n");
         return NULL;
     }
-    if(stack->size == 0){
+    if (stack->size == 0)
+    {
         fprintf(stderr, "Nothing else to pop!");
         return NULL;
     }
     void *data = stack->top->data;
-    if(stack->size == 1){
+    if (stack->size == 1)
+    {
         free(stack->top);
         stack->top = stack->bottom = NULL;
-    }else{
+    }
+    else
+    {
         Block *newBlock = stack->top->prev;
         stack->top->prev = newBlock->next = NULL;
         free(stack->top);
@@ -80,20 +132,26 @@ void *pop(Stack *stack){
     return data;
 }
 
-void *dequeu(Queu *queu){
-    if(!queu){
+void *dequeu(Queu *queu)
+{
+    if (!queu)
+    {
         fprintf(stderr, "Queu is already gone\n");
         return NULL;
     }
-    if(queu->size == 0){
+    if (queu->size == 0)
+    {
         fprintf(stderr, "Nothing else to pop!");
         return NULL;
     }
     void *data = queu->bottom->data;
-    if(queu->size == 1){
+    if (queu->size == 1)
+    {
         free(queu->bottom);
         queu->top = queu->bottom = NULL;
-    }else{
+    }
+    else
+    {
         Block *newBlock = queu->bottom->next;
         queu->bottom->next = newBlock->prev = NULL;
         free(queu->bottom);
@@ -103,16 +161,17 @@ void *dequeu(Queu *queu){
     return data;
 }
 
-void destroyStack(Stack **stack) //double pointer to have the adress point on stack to make stack point to null
-{   
-    if(!stack || !*stack){
+void destroyStack(Stack **stack) // double pointer to have the adress point on stack to make stack point to null
+{
+    if (!stack || !*stack)
+    {
         fprintf(stderr, "Stack is already gone\n");
         return;
     }
     Stack *s = *stack;
     Block *cur = s->bottom;
     Block *next;
-    while (cur) 
+    while (cur)
     {
         next = cur->next;
         free(cur);
@@ -122,16 +181,17 @@ void destroyStack(Stack **stack) //double pointer to have the adress point on st
     *stack = NULL;
 }
 
-void destroyQueu(Queu **queu) //double pointer to have the adress point on queu to make queu point to null
-{   
-    if(!queu || !*queu){
+void destroyQueu(Queu **queu) // double pointer to have the adress point on queu to make queu point to null
+{
+    if (!queu || !*queu)
+    {
         fprintf(stderr, "Queu is already gone\n");
         return;
     }
     Queu *s = *queu;
     Block *cur = s->bottom;
     Block *next;
-    while (cur) 
+    while (cur)
     {
         next = cur->next;
         free(cur);

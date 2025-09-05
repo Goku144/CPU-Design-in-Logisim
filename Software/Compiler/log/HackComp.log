@@ -169,3 +169,7 @@ gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
 gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
 [Fri 09/05/2025  1:35:12.71]  
 gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Fri 09/05/2025  2:00:51.17]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Fri 09/05/2025  2:01:09.65]  
+make: 'bin/HackComp' is up to date.
