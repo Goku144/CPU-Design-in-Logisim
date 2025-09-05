@@ -1,2 +1,3 @@
-bin\HackComp: HackComp.c
-	gcc HackComp.c -o bin\HackComp
+bin/HackComp: HackComp.c
+	gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+
