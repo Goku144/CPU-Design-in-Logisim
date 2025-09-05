@@ -41,3 +41,87 @@ cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
 [Fri 09/05/2025  1:59:45.56]  
 cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
 cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  2:42:40.99]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  2:42:50.81]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  2:43:36.35]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  2:53:04.31]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+[Fri 09/05/2025  2:54:47.35]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+[Fri 09/05/2025  2:55:21.22]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  2:59:15.74]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:03:52.29]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:05:57.25]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:06:34.08]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:07:19.33]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:10:24.90]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:17:30.78]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:19:47.08]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:20:05.39]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:21:48.98]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:22:14.93]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:25:06.46]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:31:05.91]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+[Fri 09/05/2025  3:31:23.51]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:33:48.58]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:34:23.38]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:40:17.57]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:46:23.84]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:49:26.00]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:50:21.52]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:53:23.60]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  3:56:56.17]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll
+[Fri 09/05/2025  4:06:43.20]  
+cc -O2 -Wall -Wextra -std=c11 -fPIC -I. -c Hacklib.c -o Hacklib.o
+cc Hacklib.o -shared -Wl,--out-implib,libhacklib.dll.a -o libhacklib.dll

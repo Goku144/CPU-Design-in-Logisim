@@ -10,34 +10,14 @@ int main(int argc, char *argv[])
         fprintf(stderr, "few arguments");
         return -1;
     }
-
-    printf("/***** Queu *****/\n");
-
-    Queu *queu = newQueu();
-    enqueu(queu, "tst1\n");
-    enqueu(queu, "tst2\n");
-    enqueu(queu, "tst3\n");
-    while (queu->size)
-    {
-        printf("%s", (char *)dequeu(queu));
-    }
-    destroyQueu(&queu);
-    destroyQueu(&queu);
-
-    printf("/***** Stack *****/\n");
-
-    Stack *stack = newStack();
-    push(stack, "tst1\n");
-    push(stack, "tst2\n");
-    push(stack, "tst3\n");
-    while (stack->size)
-    {
-        printf("%s", (char *)pop(stack));
-    }
-    destroyStack(&stack);
-    destroyStack(&stack);
-
-    FILE_INFO fp = extF(argv[1]);
-    printf("%s", fp.fp);
+    FILE_INFO *fp = removeEmptySpace(
+                    removeComments(
+                    extF(argv[1])
+                    )
+                    );
+    FILE *file = fopen("filetrimed.asm", "w");
+    fprintf(file, fp->fp);
+    free(fp);
+    fclose(file);
     return 0;
 }

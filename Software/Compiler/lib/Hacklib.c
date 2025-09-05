@@ -5,13 +5,16 @@
 
 /***************** I/O *****************/
 
-FILE_INFO extF(char *path)
+FILE_INFO *extF(char *path)
 {
+    FILE_INFO *out = malloc(sizeof *out);
+    out->fp = NULL;
+    out->size = 0;
     FILE *fp = fopen(path, "rb");
     if (fp == NULL)
     {
         fprintf(stderr, "fopen: Can't open the file");
-        return (FILE_INFO){NULL, 0};
+        return out;
     }
 
     fseek(fp, 0, SEEK_END);
@@ -22,19 +25,79 @@ FILE_INFO extF(char *path)
     if (buffer == NULL)
     {
         fprintf(stderr, "malloc: Can't allocate space");
-        return (FILE_INFO){NULL, 0};
+        return out;
     }
 
     if (fread(buffer, 1, size, fp) < (size_t)size)
     {
         fprintf(stderr, "fread: Can't read all the file");
-        return (FILE_INFO){NULL, 0};
+        return out;
     }
 
     buffer[size] = '\0';
     fclose(fp);
-    return (FILE_INFO){buffer, size};
+    out->fp = buffer;
+    out->size = size;
+    return out;
 }
+
+FILE_INFO *removeComments(FILE_INFO *file){
+    char *buffer = malloc(file->size + 1);
+    long k = 0;
+    for (long i = 0; i < file->size; i++)
+    {
+        if(i+1 < file->size && file->fp[i] == '/' && file->fp[i + 1] == '/')
+        {
+            while (i < file->size && file->fp[i] != '\n')
+            {
+                i++;
+            }
+            if(i >= file->size)
+                break;
+            buffer[k++] = '\n';
+        }
+        else
+        {
+            buffer[k++] = file->fp[i];
+        }
+    }
+    char *bufferWRC = malloc(k + 1);
+    memcpy(bufferWRC, buffer, (size_t)k);
+    bufferWRC[k] = '\0';
+    free(buffer);
+    free(file->fp);
+    file->fp = bufferWRC;
+    file->size = k;
+    return file;
+}
+
+FILE_INFO *removeEmptySpace(FILE_INFO *file){
+    char *buffer = malloc(file->size + 1);
+    long k = 0;
+    for (long i = 0; i < file->size; i++)
+    {
+        if (file->fp[i] != '\n' && file->fp[i] != '\r' && file->fp[i] != ' ' && file->fp[i] != '\t') {
+            while (i < file->size && file->fp[i] != '\n' && file->fp[i] != '\r')
+            {
+                if (file->fp[i] != ' ' && file->fp[i] != '\t')
+                    buffer[k++] = file->fp[i];
+                i++;
+            }
+            if (i >= file->size)
+                break;
+            buffer[k++] = '\n';
+        }
+    }
+    char *bufferWRC = malloc(k + 1);
+    memcpy(bufferWRC, buffer, (size_t)k);
+    bufferWRC[k] = '\0';
+    free(buffer);
+    free(file->fp);
+    file->fp = bufferWRC;
+    file->size = k;
+    return file;
+}
+
 
 /*********** Data Structure ***********/
 Stack *newStack(void)

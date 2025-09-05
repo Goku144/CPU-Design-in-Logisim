@@ -34,7 +34,11 @@ typedef struct __LinearBlock__ Queu;
 
 /**************************** func def ****************************/
 
-FILE_INFO extF(char *path);
+FILE_INFO *extF(char *path);
+
+FILE_INFO *removeComments(FILE_INFO *file);
+
+FILE_INFO *removeEmptySpace(FILE_INFO *file);
 
 Stack *newStack(void);
 
