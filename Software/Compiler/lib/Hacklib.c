@@ -3,263 +3,170 @@
 #include <string.h>
 #include "Hacklib.h"
 
-/***************** I/O *****************/
-
-FILE_INFO *extF(char *path)
+String extFile(const char *path)
 {
-    FILE_INFO *out = malloc(sizeof *out);
-    out->fp = NULL;
-    out->size = 0;
-    FILE *fp = fopen(path, "rb");
-    if (fp == NULL)
+    FILE *fp = fopen(path, "rb"); // open the file for read
+    String out = {NULL, 0};
+    if (fp == NULL) {perror("extF: fopen"); return out;} // handle fopen error
+
+    if(fseek(fp, 0, SEEK_END)) {perror("extF: fseek (end)"); fclose(fp); return out;} // seek end and handle error
+
+    long size = ftell(fp); // tell the curent pointer position
+    if(size == -1L) {perror("extF: ftell"); fclose(fp); return out;} // tell and handle error
+
+    if(fseek(fp, 0, SEEK_SET)) {perror("extF: fseek (set)"); fclose(fp); return out;} // seek start and handle error
+
+    size_t sz = (size_t) size;
+    out.str = malloc(sz + 1);
+    if (out.str == NULL) {perror("extF: malloc"); fclose(fp); return out;} // handle fopen error
+
+    size_t n = fread(out.str, 1, sz, fp); // read the file put data inside mallocated space of out.str
+    if (n != sz) // handle fread error
     {
-        fprintf(stderr, "fopen: Can't open the file");
-        return out;
+        if (ferror(fp)) {perror("extF: fread"); free(out.str); out.str = NULL; fclose(fp); return out;}
+        else if (feof(fp)) {out.size = n; out.str[n] = '\0'; fclose(fp); return out;}
     }
 
-    fseek(fp, 0, SEEK_END);
-    long size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-
-    char *buffer = malloc(size + 1);
-    if (buffer == NULL)
-    {
-        fprintf(stderr, "malloc: Can't allocate space");
-        return out;
-    }
-
-    if (fread(buffer, 1, size, fp) < (size_t)size)
-    {
-        fprintf(stderr, "fread: Can't read all the file");
-        return out;
-    }
-
-    buffer[size] = '\0';
     fclose(fp);
-    out->fp = buffer;
-    out->size = size;
+    out.size = n;
+    out.str[n] = '\0'; // terminator for string manipulations
     return out;
 }
 
-FILE_INFO *removeComments(FILE_INFO *file){
-    char *buffer = malloc(file->size + 1);
-    long k = 0;
-    for (long i = 0; i < file->size; i++)
+String rmComment(String file){
+    for (size_t i = 0; i < file.size; i++)
     {
-        if(i+1 < file->size && file->fp[i] == '/' && file->fp[i + 1] == '/')
-        {
-            while (i < file->size && file->fp[i] != '\n')
+        if((i + 1) < file.size && file.str[i] == '/' && file.str[i + 1] == '/'){
+            while (i < file.size && file.str[i] != '\n' && file.str[i] != '\r')
             {
+                file.str[i++] = ' '; // replace it with whit space for triming stage
+            }
+        }    
+    }
+    return file;
+}
+
+String rmEmptySpace(String file){
+    char *buffer = malloc(file.size + 1);
+    if (buffer == NULL) {perror("rmEmptySpace: malloc"); return file;}
+    size_t count = 0;
+    for (size_t i = 0; i < file.size; i++)
+    {
+        if(file.str[i] != '\n' && file.str[i] != ' ' && file.str[i] != '\t' && file.str[i] != '\r') // ignore any leading '\n' '\t' '\r'
+        {
+            while (i < file.size && file.str[i] != '\n')
+            {
+                if(file.str[i] != '\t' && file.str[i] != '\r' && file.str[i] != ' ' )
+                {   
+                    buffer[count++] = file.str[i];
+                }
                 i++;
             }
-            if(i >= file->size)
-                break;
-            buffer[k++] = '\n';
+            buffer[count++] = '\n';
         }
+    }
+    free(file.str);
+
+    char *tmp = realloc(buffer, count + 1);
+    if (!tmp) {free(buffer); perror("rmEmptySpace: realloc"); return file;}
+    tmp[count] = '\0';
+
+    file.str = tmp;
+    file.size = count;
+    return file;
+}
+
+// String type to define it as array use
+// String *string = malloc(n+1 * sizeof *string);
+// now u have
+// string[0] = {char *str, long size}
+// string[1] = {char *str, long size}
+// ...
+// string[n] = {NULL, 0} terminator
+
+String *extInstruction(String file)
+{
+    size_t size = 0;
+    for (size_t i = 0; i < file.size; i++)
+    {
+        if (file.str[i] == '\n')
+            size++; 
+    }
+
+    String *buffer = malloc((size + 1) * sizeof *buffer );
+    if (buffer == NULL) {perror("extInstruction: malloc"); return NULL;}
+
+    size_t count = 0, pos = 0;
+    for (size_t i = 0; i < size; i++)
+    {
+        while ((pos + count) < file.size && file.str[pos + count] != '\n')
+            count++;
+        buffer[i].str = malloc(count + 1);
+        if (!buffer) { perror("extInstruction: malloc"); return NULL;}
+        count = 0;
+
+        while (pos < file.size && file.str[pos] != '\n')
+        {
+            buffer[i].str[count++] = file.str[pos++];
+        }
+
+        buffer[i].str[count] = '\0';
+        buffer[i].size = count;
+        count = 0;
+        pos++;
+    }
+
+    buffer[size] = (String) {NULL, 1};
+    free(file.str);
+    return buffer;
+}
+
+char *newBinarySheat(String *file)
+{
+    size_t i = 0;
+    size_t size = 0; 
+    while (file[i].str)
+    {   
+        size++;
+        i++;
+    }
+    size = size * 17;
+    char *buffer = malloc( size + 1);
+    if (buffer == NULL) {perror("newBinarySheat: malloc"); return NULL;}
+
+    for (i = 0; i < size; i++)
+    {
+        if(i % 17 == 16)
+            buffer[i] = '\n';
         else
-        {
-            buffer[k++] = file->fp[i];
-        }
+            buffer[i] = '0';
     }
-    char *bufferWRC = malloc(k + 1);
-    memcpy(bufferWRC, buffer, (size_t)k);
-    bufferWRC[k] = '\0';
-    free(buffer);
-    free(file->fp);
-    file->fp = bufferWRC;
-    file->size = k;
-    return file;
+    buffer[size] = '\0';
+    return buffer;
 }
 
-FILE_INFO *removeEmptySpace(FILE_INFO *file){
-    char *buffer = malloc(file->size + 1);
-    long k = 0;
-    for (long i = 0; i < file->size; i++)
+void Ainstruction(String *file, char *buffer, int line) // line is wich instruction line we are on ofsset
+{ 
+    int num, count = 0;
+    int offset = line * 17;
+    char *str =  malloc(file[line].size);
+    strcpy(str, file[line].str + 1);
+    num = atoi(str);
+
+    while (num != 0)
     {
-        if (file->fp[i] != '\n' && file->fp[i] != '\r' && file->fp[i] != ' ' && file->fp[i] != '\t') {
-            while (i < file->size && file->fp[i] != '\n' && file->fp[i] != '\r')
-            {
-                if (file->fp[i] != ' ' && file->fp[i] != '\t')
-                    buffer[k++] = file->fp[i];
-                i++;
-            }
-            if (i >= file->size)
-                break;
-            buffer[k++] = '\n';
-        }
+        buffer[15 + offset - count] = (char) ('0' + num % 2);
+        num/=2;
+        count++;
     }
-    char *bufferWRC = malloc(k + 1);
-    memcpy(bufferWRC, buffer, (size_t)k);
-    bufferWRC[k] = '\0';
-    free(buffer);
-    free(file->fp);
-    file->fp = bufferWRC;
-    file->size = k;
-    return file;
+    free(str);
 }
 
-
-/*********** Data Structure ***********/
-Stack *newStack(void)
-{
-    Stack *stack = malloc(sizeof *stack);
-    stack->bottom = NULL;
-    stack->top = NULL;
-    stack->size = 0;
-    return stack;
-}
-
-Queu *newQueu(void)
-{
-    Queu *queu = malloc(sizeof *queu);
-    queu->bottom = NULL;
-    queu->top = NULL;
-    queu->size = 0;
-    return queu;
-}
-
-void push(Stack *stack, void *data)
-{
-    if (!stack)
+void freeExtInst(String *file){
+    int j = 0;
+    while (file[j].str)
     {
-        fprintf(stderr, "Stack is already gone\n");
-        return;
+        free(file[j++].str);
     }
-    Block *newBlock = malloc(sizeof *newBlock);
-    newBlock->data = data;
-    newBlock->next = NULL;
-    newBlock->prev = NULL;
-    if (stack->bottom == NULL)
-    {
-        stack->top = stack->bottom = newBlock;
-    }
-    else
-    {
-        stack->top->next = newBlock;
-        newBlock->prev = stack->top;
-        stack->top = newBlock;
-    }
-    stack->size++;
-}
-
-void enqueu(Queu *queu, void *data)
-{
-    if (!queu)
-    {
-        fprintf(stderr, "Queu is already gone\n");
-        return;
-    }
-    Block *newBlock = malloc(sizeof *newBlock);
-    newBlock->data = data;
-    newBlock->next = NULL;
-    newBlock->prev = NULL;
-    if (queu->bottom == NULL)
-    {
-        queu->top = queu->bottom = newBlock;
-    }
-    else
-    {
-        queu->top->next = newBlock;
-        newBlock->prev = queu->top;
-        queu->top = newBlock;
-    }
-    queu->size++;
-}
-
-void *pop(Stack *stack)
-{
-    if (!stack)
-    {
-        fprintf(stderr, "Stack is already gone\n");
-        return NULL;
-    }
-    if (stack->size == 0)
-    {
-        fprintf(stderr, "Nothing else to pop!");
-        return NULL;
-    }
-    void *data = stack->top->data;
-    if (stack->size == 1)
-    {
-        free(stack->top);
-        stack->top = stack->bottom = NULL;
-    }
-    else
-    {
-        Block *newBlock = stack->top->prev;
-        stack->top->prev = newBlock->next = NULL;
-        free(stack->top);
-        stack->top = newBlock;
-    }
-    stack->size--;
-    return data;
-}
-
-void *dequeu(Queu *queu)
-{
-    if (!queu)
-    {
-        fprintf(stderr, "Queu is already gone\n");
-        return NULL;
-    }
-    if (queu->size == 0)
-    {
-        fprintf(stderr, "Nothing else to pop!");
-        return NULL;
-    }
-    void *data = queu->bottom->data;
-    if (queu->size == 1)
-    {
-        free(queu->bottom);
-        queu->top = queu->bottom = NULL;
-    }
-    else
-    {
-        Block *newBlock = queu->bottom->next;
-        queu->bottom->next = newBlock->prev = NULL;
-        free(queu->bottom);
-        queu->bottom = newBlock;
-    }
-    queu->size--;
-    return data;
-}
-
-void destroyStack(Stack **stack) // double pointer to have the adress point on stack to make stack point to null
-{
-    if (!stack || !*stack)
-    {
-        fprintf(stderr, "Stack is already gone\n");
-        return;
-    }
-    Stack *s = *stack;
-    Block *cur = s->bottom;
-    Block *next;
-    while (cur)
-    {
-        next = cur->next;
-        free(cur);
-        cur = next;
-    }
-    free(s);
-    *stack = NULL;
-}
-
-void destroyQueu(Queu **queu) // double pointer to have the adress point on queu to make queu point to null
-{
-    if (!queu || !*queu)
-    {
-        fprintf(stderr, "Queu is already gone\n");
-        return;
-    }
-    Queu *s = *queu;
-    Block *cur = s->bottom;
-    Block *next;
-    while (cur)
-    {
-        next = cur->next;
-        free(cur);
-        cur = next;
-    }
-    free(s);
-    *queu = NULL;
+    free(file);
 }
