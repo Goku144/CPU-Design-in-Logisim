@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#if !defined(__DATA_STRUCTURE__)
-#define __DATA_STRUCTURE__
+#if !defined(__HACK_LIB__)
+#define __HACK_LIB__
 
 struct __String__
 {
@@ -9,7 +9,21 @@ struct __String__
     size_t size;
 };
 
+struct __Map3bit__
+{ 
+    const char *opc; 
+    const char *bits;
+};
+
+struct __Map10bit__
+{ 
+    const char *opc; 
+    const char *bits;
+};
+
 typedef struct __String__ String;
+typedef struct __Map3bit__ Map3bit;
+typedef struct __Map10bit__ Map10bit;
 
 String extFile(const char *path);
 
@@ -19,10 +33,14 @@ String rmEmptySpace(String file);
 
 String *extInstruction(String file);
 
-char *newBinarySheat(String *file);
+char *newBinarySheet(String *file);
 
-void Ainstruction(String *file, char *buffer, int line);
+int Ainstruction(const String *file, char *buffer, int line);
+
+int Cinstruction(const String *file, char *buffer, int line);
 
 void freeExtInst(String *file);
 
-#endif // __DATA_STRUCTURE__
+int hackAssembler(const char *inpath, const char *outpath);
+
+#endif // __HACK_LIB__

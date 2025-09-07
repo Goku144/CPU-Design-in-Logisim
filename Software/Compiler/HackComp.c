@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 #include <Hacklib.h>
 
 // String type to define it as array use
@@ -11,23 +12,18 @@
 // ...
 // string[n] = {NULL, 0} terminator
 
+// returns the 0-based index of ch in s, or -1 if not found
+
+
+
+
 int main(int argc, char *argv[])
 {
-    if (argc < 2)
+    if (argc < 3)
     {
         fprintf(stderr, "few arguments");
         return -1;
     }
-    String *file = extInstruction(rmEmptySpace(rmComment(extFile(argv[1])))); // its terminator is the null terminator
-    
-    char *buffer = newBinarySheat(file);
-    int i = 0;
-    while (file[i].str)
-    {
-        Ainstruction(file, buffer, i);
-        i++;
-    }
-
-    printf("%s", buffer);
+    hackAssembler(argv[1], argv[2]);
     return 0;
 }

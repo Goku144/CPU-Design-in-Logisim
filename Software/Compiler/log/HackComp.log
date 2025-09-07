@@ -531,3 +531,137 @@ gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
 gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
 [Sat 09/06/2025  6:57:32.13]  
 make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025  6:58:52.34]  
+make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025 16:18:13.04]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 16:18:31.38]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 16:27:56.24]  
+make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025 16:28:48.72]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 16:42:00.08]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 17:47:13.20]  
+make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025 17:47:47.94]  
+make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025 17:53:47.45]  
+make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025 17:56:16.41]  
+make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025 17:56:25.94]  
+make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025 18:00:14.23]  
+make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025 20:28:41.79]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 20:30:47.17]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 20:30:57.20]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 20:31:57.08]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 20:32:13.61]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 20:32:22.43]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 20:32:42.43]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 21:33:18.97]  
+make: 'bin/HackComp' is up to date.
+[Sat 09/06/2025 21:33:26.20]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sat 09/06/2025 21:33:45.52]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  0:02:10.17]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  0:02:19.24]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  0:03:53.50]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  0:07:29.33]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  0:19:01.83]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  0:26:23.37]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  0:30:10.95]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  0:43:40.59]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  1:40:58.80]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  1:44:40.55]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  1:46:12.85]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  1:47:08.75]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  1:47:50.46]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  1:54:33.04]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  1:55:16.33]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  1:58:47.39]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  2:00:26.40]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  2:01:05.76]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  2:02:40.38]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  2:02:58.89]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  2:03:42.57]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  3:19:11.22]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  3:19:28.85]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  3:19:48.36]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  3:20:07.46]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  3:20:52.85]  
+make: 'bin/HackComp' is up to date.
+[Sun 09/07/2025  4:41:48.07]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:44:10.30]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:44:25.06]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:46:21.34]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:48:42.17]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:49:56.09]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:50:09.85]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:50:21.83]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:50:45.93]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:51:01.78]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:51:07.45]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:54:18.47]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:55:45.72]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:56:36.08]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  4:56:56.39]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  5:04:31.91]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  5:10:07.35]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  5:17:59.84]  
+gcc -O2 -Wall -Wextra -std=c11 HackComp.c -lhacklib -o bin/HackComp
+[Sun 09/07/2025  5:29:17.00]  
+make: 'bin/HackComp' is up to date.
