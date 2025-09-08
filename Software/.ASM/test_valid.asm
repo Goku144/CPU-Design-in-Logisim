@@ -3,7 +3,7 @@
 // Touch a few predefined symbols
 @SP
 M=0
-@LCL
+@LCfL
 M=1
 
 @2
