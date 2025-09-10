@@ -89,7 +89,7 @@ M=D
 D=A
 @95
 0;JMP
-(RET_ADDREÖSS_CALL0)
+(RET_AD%DRESS_CALL0)
 (ball.new)
 @15
 D=A

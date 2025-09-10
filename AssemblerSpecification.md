@@ -182,7 +182,3 @@ Binary: `111 0 101010 000 111` → `1110101010000111`
 * The assembler resolves symbols in **two passes**: first collects labels (ROM addresses), then resolves A-instruction symbols (labels + predefined + variables).
 * Variables start at **address 16** unless you predefine them.
 
-```
-
-If you want this split into two separate files automatically (and placed in your repo), say the word and I’ll output them as ready-to-save files with the exact paths.
-```

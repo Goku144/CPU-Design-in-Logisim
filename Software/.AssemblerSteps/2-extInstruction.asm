@@ -89,7 +89,7 @@
 [D=A] -> //C instruction
 [@95] -> //A instruction
 [0;JMP] -> //C instruction
-[(RET_ADDREÖSS_CALL0)] -> //Label
+[(RET_AD%DRESS_CALL0)] -> //Label
 [(ball.new)] -> //Label
 [@15] -> //A instruction
 [D=A] -> //C instruction
