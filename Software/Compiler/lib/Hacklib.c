@@ -1,114 +1,95 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <stddef.h>
-#include <ctype.h>
 #include "Hacklib.h"
 
-/******************** static var ********************/
+// HACK API ASSEMBLER REQUESTS
+_Static_assert(INT_MAX >= UINT16_MAX, "int too small to hold uint16_t");
 
-static const Map3bit destmap[] = 
+// todo function check number
+
+static const InstructionMap destmap[] = 
 {
-    {"M", "001"}, {"D", "010"}, {"MD", "011"}, {"A", "100"}, 
-    {"AM", "101"}, {"AD", "110"}, {"AMD", "111"}, {NULL, "000"}
+    {"M",  "001"}, {"D",  "010"}, {"MD",  "011"}, {"A", "100"}, 
+    {"AM", "101"}, {"AD", "110"}, {"AMD", "111"}, {NULL, NULL}
 };
 
-static const Map10bit compmap[] = 
+static const InstructionMap compmap[] = 
 {
     // for A
-    {"0", "1110101010"}, {"1", "1110111111"}, {"-1", "1110111010"},
-    {"D", "1110001100"}, {"A", "1110110000"}, {"!D", "1110001101"},
-    {"!A", "1110110001"}, {"-D", "1110001111"}, {"-A", "1110110011"},
+    {"0",   "1110101010"}, {"1",   "1110111111"}, {"-1",  "1110111010"},
+    {"D",   "1110001100"}, {"A",   "1110110000"}, {"!D",  "1110001101"},
+    {"!A",  "1110110001"}, {"-D",  "1110001111"}, {"-A",  "1110110011"},
     {"D+1", "1110011111"}, {"A+1", "1110110111"}, {"D-1", "1110001110"},
     {"A-1", "1110110010"}, {"D+A", "1110000010"}, {"A+D", "1110000010"},
     {"D-A", "1110010011"}, {"A-D", "1110000111"}, {"D&A", "1110000000"},
     {"A&D", "1110000000"}, {"D|A", "1110010101"}, {"A|D", "1110010101"},
     // for M
-    {"M",   "1111110000"}, {"!M",  "1111110001"}, {"-M", "1111110011"},
+    {"M",   "1111110000"}, {"!M",  "1111110001"}, {"-M",  "1111110011"},
     {"M+1", "1111110111"}, {"M-1", "1111110010"}, {"D+M", "1111000010"},
     {"M+D", "1111000010"}, {"D-M", "1111010011"}, {"M-D", "1111000111"},
     {"D&M", "1111000000"}, {"M&D", "1111000000"}, {"D|M", "1111010101"},
-    {"M|D", "1111010101"}, {NULL, "0000000000"}
+    {"M|D", "1111010101"}, {NULL, NULL}
 };
 
-static const Map3bit jmpmap[] = 
+static const InstructionMap jmpmap[] = 
 {
     {"JGT", "001"}, {"JEQ", "010"}, {"JGE", "011"}, {"JLT", "100"}, 
-    {"JNE", "101"}, {"JLE", "110"}, {"JMP", "111"}, {NULL, "000"}
+    {"JNE", "101"}, {"JLE", "110"}, {"JMP", "111"}, {NULL, NULL}
 };
 
-static const Label preSymboles[] = 
+static const Pair preSymboles[] = 
 { 
-    {"R0", 0}, {"R1", 1}, {"R2", 2}, {"R3", 3}, {"R4", 4}, {"R5", 5},
-    {"R6", 6}, {"R7", 7}, {"R8", 8}, {"R9", 9}, {"R10", 10}, {"R11", 11},
-    {"R12", 12}, {"R13", 13}, {"R14", 14}, {"R15", 15}, {"SCREEN", 16384}, 
-    {"KBO", 24576}, {"SP", 0}, {"LCL", 1}, {"ARG", 2}, {"THIS", 3}, {"THAT", 4},
-    {NULL, -1},
+    {"R0",   0}, {"R1",         1}, {"R2",       2}, {"R3",   3}, {"R4",   4}, 
+    {"R5",   5}, {"R6",         6}, {"R7",       7}, {"R8",   8}, {"R9",   9}, 
+    {"R10", 10}, {"R11",       11}, {"R12",     12}, {"R13", 13}, {"R14", 14}, 
+    {"R15", 15}, {"SCREEN", 16384},  {"KBD", 24576}, {"SP",   0}, {"LCL",  1}, 
+    {"ARG",  2}, {"THIS",       3}, {"THAT",     4}, {NULL,  -1},
 };
 
-static size_t var = 16;
+static uint16_t var = 16;
 
-static int isValidLabel(const char *s) {
-     if (!s || !*s) return 0;
-
-    unsigned char c = (unsigned char)*s;
-    // first char: A–Z a–z _ . $ :
-    if (!((c >= 'A' && c <= 'Z') ||
-          (c >= 'a' && c <= 'z') ||
-           c == '_' || c == '.' || c == '$' || c == ':'))
-        return 0;
-
-    // rest: A–Z a–z 0–9 _ . $ :
-    for (s++; *s; s++) {
-        c = (unsigned char)*s;
-        if (!((c >= 'A' && c <= 'Z') ||
-              (c >= 'a' && c <= 'z') ||
-              (c >= '0' && c <= '9') ||
-               c == '_' || c == '.' || c == '$' || c == ':'))
-            return 0;
-    }
-    return 1;
-}
-
-int find_pos(const char *s, int ch) 
+static int find_pos(const char *s, int ch) 
 {
     const char *p = strchr(s, ch);   // first occurrence
     return p ? (int)(p - s) : -1;
 }
 
+/********************************** Data Structure **********************************/
+
 LinkedList *newLinkedList(void)
 {
-    LinkedList *list = malloc(sizeof *list);
-    if(list == NULL){ perror("newLinkedList"); return NULL;}
-    *list = (LinkedList) {0};
+    LinkedList *list = malloc(sizeof (*list));
+    if(!list) {perror("newLinkedList(malloc)"); return NULL;}
+    list->head = list->tail = NULL;
+    list->size = 0;
     return list;
 }
 
-int addNode(LinkedList *list, Label data)
+int addNode(LinkedList *list, Pair data)
 {
-    if (!list) {errno = EINVAL; perror("addNode"); return -1;}
+    if (!list) {fprintf(stderr, "addNode Error: list is NULL\n"); return -1;}
     Node *newNode = malloc(sizeof *newNode);
-    if(newNode == NULL){perror("addNode"); return -1;}
-
-    newNode->data = data;
+    if(!newNode) {perror("addNode(malloc)"); return -1;}
+    // add data to the Node
     newNode->next = NULL;
-    if(list->head == NULL) {list->head = list->tail = newNode;}
+    newNode->data = data;
+    if(!list->head)
+        list->tail = list->head = newNode;
     else
     {
         list->tail->next = newNode;
-        list->tail = newNode;
+        list->tail = newNode; 
     }
     list->size++;
     return 0;
 }
 
-int searchLinkedList(const LinkedList *list, const char* symbole)
+int searchLinkedList(const LinkedList *list, const char *key)
 {
-    Node *searchNode =  list ? list->head : NULL;
+    if (!list) {fprintf(stderr, "searchLinkedList Error: list is NULL\n"); return -1;}
+    Node *searchNode = list->head;
     while (searchNode)
     {
-        if(strcmp(searchNode->data.symbole, symbole) == 0) return searchNode->data.value;
+        if(strcmp(searchNode->data.key, key) == 0)
+            return (int) searchNode->data.value;
         searchNode = searchNode->next;
     }
     return -1;
@@ -116,473 +97,531 @@ int searchLinkedList(const LinkedList *list, const char* symbole)
 
 void printLinkedList(const LinkedList *list)
 {
-    if (!list) {printf("(NULL)"); return;}
+    if(!list) goto _return;
     Node *printNode = list->head;
     while (printNode)
     {
-        printf("{%s, %lld}", printNode->data.symbole, printNode->data.value);
-        printf(" -> ");
+        printf("{%s, %hu} -> ", printNode->data.key, printNode->data.value);
         printNode = printNode->next;
     }
-    printf("NULL\n");
+    _return:
+        printf("(NULL)\n");
 }
 
-void freeLinkedList(LinkedList *list)
+void fprintLinkedList(const LinkedList *list)
 {
-    if (!list) {printf("list is NULL\n"); return;}
-    Node *freeNode = list->head;
-    while (freeNode)
-    {
-        list->head = freeNode->next;
-        free(freeNode);
-        freeNode = list->head;
-    }
-    free(list);
-}
+    // Assembler step 3-2 output
+    FILE *fp = fopen("..\\.AssemblerSteps\\3-2-SymbolesTree.json", "w");
+    if (!fp) return;
 
-String extFile(const char *path)
-{
-    FILE *fp = fopen(path, "rb"); // open the file for read
-    String out = {NULL, 0};
-    if (fp == NULL) {perror("extF: fopen"); return out;} // handle fopen error
-
-    if(fseek(fp, 0, SEEK_END)) {perror("extF: fseek (end)"); fclose(fp); return out;} // seek end and handle error
-
-    long size = ftell(fp); // tell the curent pointer position
-    if(size == -1L) {perror("extF: ftell"); fclose(fp); return out;} // tell and handle error
-
-    if(fseek(fp, 0, SEEK_SET)) {perror("extF: fseek (set)"); fclose(fp); return out;} // seek start and handle error
-
-    size_t sz = (size_t) size;
-    out.str = malloc(sz + 1);
-    if (out.str == NULL) {perror("extF: malloc"); fclose(fp); return out;} // handle fopen error
-
-    size_t n = fread(out.str, 1, sz, fp); // read the file put data inside mallocated space of out.str
-    if (n != sz) // handle fread error
-    {
-        if (ferror(fp)) {perror("extF: fread"); free(out.str); out.str = NULL; fclose(fp); return out;}
-        else if (feof(fp)) {out.size = n; out.str[n] = '\0'; fclose(fp); return out;}
+    if (!list || !list->head) {
+        fputs("[]", fp);
+        fclose(fp);
+        return;
     }
 
-    fclose(fp);
-    out.size = n;
-    out.str[n] = '\0'; // terminator for string manipulations
-    return out;
-}
+    Node *printNode = list->head;
+    fprintf(fp, "[\n");
 
-String rmComment(String file){
-    for (size_t i = 0; i < file.size; i++)
+    while (printNode)
     {
-        if((i + 1) < file.size && file.str[i] == '/' && file.str[i + 1] == '/'){
-            while (i < file.size && file.str[i] != '\n' && file.str[i] != '\r')
-            {
-                file.str[i++] = ' '; // replace it with whit space for triming stage
-            }
-        }    
-    }
-    return file;
-}
+        // JSON keys must be quoted; strings too
+        fprintf(fp, "  {\"Symbole\":\"%s\",\"value\":%hu}", 
+                printNode->data.key ? printNode->data.key : "",
+                (unsigned short)printNode->data.value);
 
-String rmEmptySpace(String file){
-    char *buffer = malloc(file.size + 1);
-    if (buffer == NULL) {perror("rmEmptySpace: malloc"); return file;}
-    size_t count = 0;
-    for (size_t i = 0; i < file.size; i++)
-    {
-        if(file.str[i] != '\n' && file.str[i] != ' ' && file.str[i] != '\t' && file.str[i] != '\r') // ignore any leading '\n' '\t' '\r'
-        {
-            while (i < file.size && file.str[i] != '\n')
-            {
-                if(file.str[i] != '\t' && file.str[i] != '\r' && file.str[i] != ' ' )
-                {   
-                    buffer[count++] = file.str[i];
-                }
-                i++;
-            }
-            buffer[count++] = '\n';
-        }
-    }
-    free(file.str);
-
-    char *tmp = realloc(buffer, count + 1);
-    if (!tmp) {free(buffer); perror("rmEmptySpace: realloc"); return file;}
-    tmp[count] = '\0';
-
-    file.str = tmp;
-    file.size = count;
-    return file;
-}
-
-String extLabel(String file, LinkedList *list)
-{
-    String buffer = (String){ (char *)malloc(file.size + 1), file.size };
-    if (!buffer.str) { perror("extLabel: malloc"); return (String){NULL,0}; }
-    buffer.str[file.size] = '\0';
-
-    for (int i = 0; preSymboles[i].symbole; i++) addNode(list, preSymboles[i]);
-
-    size_t didx = 0;
-    int buffLines = 0, sizeLine = 0;
-
-    for (size_t sidx = 0; sidx < file.size; sidx++)
-    {
-        if (file.str[sidx] == '(')
-        {
-            while (sidx < file.size && file.str[sidx] != '\n') { sidx++; sizeLine++; }
-            if (sizeLine < 3) { fprintf(stderr,"invalid label: empty label not allowed\n"); return (String){NULL,0}; }
-            if (file.str[sidx - 1] != ')') { fprintf(stderr,"invalid label: label must end with ')'\n"); return (String){NULL,0}; }
-
-            char *str = (char *)malloc((size_t)sizeLine - 1);
-            if (!str) { perror("extLabel: malloc"); return (String){NULL,0}; }
-            memcpy(str, file.str + sidx - sizeLine + 1, (size_t)sizeLine - 2);
-            str[sizeLine - 2] = '\0';
-
-            for (size_t p = sidx - sizeLine + 1; p < sidx - 1; ++p) {
-                if (file.str[p] == '(' || file.str[p] == ')') {
-                    fprintf(stderr,"invalid label syntax: extra parentheses inside\n");
-                    return (String){NULL,0};
-                }
-            }
-
-            if (!isValidLabel(str)) {
-                fprintf(stderr,"invalid label symboles: invalid typing\n");
-                return (String){NULL,0};
-            }
-
-            if (searchLinkedList(list, str) != -1) {
-                fprintf(stderr,"multiple label declaration: you have already declared (%s)\n", str);
-                return (String){NULL,0};
-            }
-
-            addNode(list, (Label){ str, buffLines });
-            sizeLine = 0;
-        }
+        if (printNode->next)
+            fprintf(fp, ",\n");
         else
-        {
-            while (sidx < file.size && file.str[sidx] != '\n')
-                buffer.str[didx++] = file.str[sidx++];
-            if (sidx < file.size) { buffer.str[didx++] = '\n'; buffLines++; }
-        }
+            fprintf(fp, "\n");
+
+        printNode = printNode->next;
     }
 
-    buffer.str[didx] = '\0';
-    buffer.size = didx;
+    fprintf(fp, "]");
+    fclose(fp);
+}
 
-    char *tmp = realloc(buffer.str, buffer.size + 1);
-    if (tmp) buffer.str = tmp;
 
+void freeLinkedList(LinkedList **list) // used if all key has been passed by value
+{
+    if (!list || !(*list)) {fprintf(stderr, "freeLinkedList Error: list is NULL\n"); return;}
+    Node *freeNode = (*list)->head;
+    while ((*list)->head)
+    {
+        freeNode = freeNode->next;
+        free((*list)->head);
+        (*list)->head = freeNode;
+    }
+    free(*list);
+    *list = NULL;
+}
+
+void freeDeepLinkedList(LinkedList **list) // used if all key has been mallocated
+{
+    if (!list || !(*list)) {fprintf(stderr, "freeDeepLinkedList Error: list is NULL\n"); return;}
+    
+    int index = 0;
+    while (index < 23)
+    {
+        (*list)->head = (*list)->head->next;
+        index++;
+    }
+    Node *freeDeepNode = (*list)->head;
+    while ((*list)->head)
+    {
+        if((*list)->head->data.key) free((*list)->head->data.key);
+        freeDeepNode = freeDeepNode->next;
+        free((*list)->head);
+        (*list)->head = freeDeepNode;
+    }
+    free(*list);
+    *list = NULL;
+}
+
+
+/********************************** Assembler **********************************/
+
+String extASMFile(const char *path)
+{
+    // initialize variables
+    String buffer = (String) {NULL, 0};
+    char *memp = NULL;
+    
+    // opening the file
+    FILE *fp = fopen(path, "rb");
+    if(!fp) {perror("extASMFile(fopen)"); goto _return;}
+
+    // extracting the file size
+    if(fseek(fp, 0, SEEK_END)) {perror("extASMFile(fseek(END))"); goto _close;}
+    long fs = ftell(fp);    
+    if(fs == -1L) {perror("extASMFile(ftell)"); goto _close;}
+    size_t size = (size_t) fs;
+    if(fseek(fp, 0, SEEK_SET)) {perror("extASMFile(fseek(START))"); goto _close;}
+
+    // mallocating buffer space
+    memp = malloc(size + 1);
+    if(!memp) {perror("extASMFile(malloc)"); goto _close;}
+
+    // read the file
+    if(fread(memp, 1, size, fp) < size) {perror("extASMFile(fread)"); free(memp); memp = NULL; goto _close;}
+
+    // closing the file
+    _close:
+        if(fclose(fp) == EOF) {perror("extASMFile(fclose)"); if(memp) free(memp); goto _return;}
+
+     // assign value and EOF
+     if(memp)
+     {
+        buffer = (String) {memp, size};
+        buffer.str[size] = '\0';
+     }
+
+    // return from function call
+    _return:
+        return buffer;
+}
+
+String trimASMFile(String file)
+{
+    // mallocating buffer space
+    String buffer = (String) {malloc(file.size + 1), file.size};
+    if(!buffer.str) {perror("trimASMFile(malloc)"); return file;}
+    // starting search
+    size_t dindx = 0;
+    for (size_t sindx = 0; sindx < file.size; sindx++)
+    {
+        // checks for leading empty chars
+        if(file.str[sindx] != '\r' && file.str[sindx] != '\n' && file.str[sindx] != '\t' && file.str[sindx] != ' ')
+        {
+            // remove outside comments
+            if((sindx + 1) < file.size && file.str[sindx] == '/' && file.str[sindx + 1] == '/')
+            {
+                while (sindx < file.size && file.str[sindx] != '\n')
+                    sindx++;
+                continue;
+            }
+            // check inside the line
+            while (sindx < file.size && file.str[sindx] != '\n')
+            {
+                // remove inner comment
+                if((sindx + 1) < file.size && file.str[sindx] == '/' && file.str[sindx + 1] == '/')
+                {
+                    while (sindx < file.size && file.str[sindx] != '\n')
+                         sindx++;
+                    continue;
+                }
+                // remove any inside whit spaces
+                if (file.str[sindx] == '\r' || file.str[sindx] == '\t' || file.str[sindx] == ' ')
+                {
+                    sindx++;
+                    continue;
+                }
+                // insert valid char insid the buffer
+                buffer.str[dindx++] = file.str[sindx++];
+            }
+            // add new line char
+            buffer.str[dindx++] = '\n';
+       }
+    }
+    // reallocate the new buffer space
+    char *tmp = realloc(buffer.str, dindx + 1);
+    if (!tmp) {perror("trimASMFile(realloc)"); free(buffer.str); return file;}
+    buffer = (String) {tmp, dindx};
+    buffer.str[dindx] = '\0';
+    // free and return
     free(file.str);
+
+    //Assembler step 1 output
+    FILE *fp = fopen("..\\.AssemblerSteps\\1-trimASMFILE.asm", "w");
+    if(!fp) return buffer;
+    fprintf(fp, "%s", buffer.str);
+    fclose(fp);
+
     return buffer;
 }
-
-String convLabel(String file, LinkedList *list)
-{
-    // allocate a roomy buffer (roughly x2) for possible symbol→number expansion
-    size_t cap = file.size * 2 + 1;
-    String out = (String){ (char *)malloc(cap), cap };
-    if (!out.str) { perror("convLabel: malloc"); return (String){NULL, 0}; }
-
-    size_t w = 0;                 // write index into out.str
-    size_t i = 0;                 // read index into file.str
-
-    while (i < file.size) {
-        if (file.str[i] == '@') {
-            i++; // skip '@'
-
-            // grab token until newline (or end)
-            size_t start = i;
-            while (i < file.size && file.str[i] != '\n') i++;
-            size_t len = i - start;
-
-            if (len == 0) { // "@\n" → invalid
-                fprintf(stderr, "invalid A-instruction: empty after '@'\n");
-                free(out.str);
-                return (String){NULL, 0};
-            }
-
-            const char *tok = file.str + start;
-
-            // detect pure decimal number: strtol must consume the whole token
-            errno = 0;
-            char *endptr = NULL;
-            long num = strtol(tok, &endptr, 10);
-            int is_number = (errno == 0 && endptr == tok + len);
-
-            if (is_number) {
-                // keep it as @<number>
-                int n = snprintf(out.str + w, cap - w, "@%ld", num);
-                if (n < 0 || (size_t)n >= cap - w) { free(out.str); return (String){NULL, 0}; }
-                w += (size_t)n;
-            } else {
-                // treat as symbol
-                char *sym = (char *)malloc(len + 1);
-                if (!sym) { perror("convLabel: malloc sym"); free(out.str); return (String){NULL, 0}; }
-                memcpy(sym, tok, len);
-                sym[len] = '\0';
-
-                if (!isValidLabel(sym)) {
-                    fprintf(stderr, "invalid label symboles: invalid typing\n");
-                    free(sym);
-                    free(out.str);
-                    return (String){NULL, 0};
-                }
-
-                int value = searchLinkedList(list, sym);
-                if (value == -1) {                // new variable symbol
-                    value = (int)var++;
-                    if (addNode(list, (Label){ sym, value }) != 0) {
-                        free(sym);
-                        free(out.str);
-                        return (String){NULL, 0};
-                    }
-                } else {
-                    free(sym); // already in table
-                }
-
-                int n = snprintf(out.str + w, cap - w, "@%d", value);
-                if (n < 0 || (size_t)n >= cap - w) { free(out.str); return (String){NULL, 0}; }
-                w += (size_t)n;
-            }
-
-            // copy trailing newline if present
-            if (i < file.size && file.str[i] == '\n') {
-                if (w + 1 >= cap) { free(out.str); return (String){NULL, 0}; }
-                out.str[w++] = '\n';
-                i++; // consume '\n'
-            }
-        } else {
-            // copy non-@ text verbatim (including newlines)
-            if (w + 1 >= cap) { free(out.str); return (String){NULL, 0}; }
-            out.str[w++] = file.str[i++];
-        }
-    }
-
-    out.str[w] = '\0';
-    out.size   = w;
-
-    // shrink to fit (optional)
-    char *tmp = realloc(out.str, w + 1);
-    if (tmp) out.str = tmp;
-
-    free(file.str);
-    freeLinkedList(list); // symbol table no longer needed after conversion
-    return out;
-}
-
 
 String *extInstruction(String file)
 {
-    size_t size = 0;
-    for (size_t i = 0; i < file.size; i++)
+    size_t indx = 0, lineSize = 0;
+    // extracting number of lines
+    while (indx < file.size)
     {
-        if (file.str[i] == '\n')
-            size++; 
+        if(file.str[indx] == '\n')
+            lineSize++;
+        indx++;
+    } 
+    size_t dsize = 0, offset = 0;
+    // mallocating the buffer array
+    String *buffer = malloc((lineSize + 1) * sizeof *buffer);
+    if(!buffer) {perror("extInstruction(malloc)"); return NULL;}
+    // retreve lines loop
+    for (size_t line = 0; line < lineSize; line++)
+    {
+        // retreving the line size
+        while (offset + dsize < file.size && file.str[offset + dsize] != '\n')
+            dsize++;
+        buffer[line].str = malloc(dsize + 1);
+        if(!buffer[line].str) {perror("extInstruction(malloc)"); while(line){free(buffer[--line].str);} free(buffer); return NULL;}
+        // copy data
+        memcpy(buffer[line].str, file.str + offset, dsize);
+        buffer[line].str[dsize] = '\0';
+        buffer[line].size = dsize;
+        offset += dsize + 1;
+        dsize = 0;
     }
 
-    String *buffer = malloc((size + 1) * sizeof *buffer );
-    if (buffer == NULL) {perror("extInstruction: malloc"); return NULL;}
-
-    size_t count = 0, pos = 0;
-    for (size_t i = 0; i < size; i++)
-    {
-        while ((pos + count) < file.size && file.str[pos + count] != '\n')
-            count++;
-        buffer[i].str = malloc(count + 1);
-        if (!buffer[i].str) { perror("extInstruction: malloc"); return NULL;}
-        count = 0;
-
-        while (pos < file.size && file.str[pos] != '\n')
-        {
-            buffer[i].str[count++] = file.str[pos++];
-        }
-
-        buffer[i].str[count] = '\0';
-        buffer[i].size = count;
-        count = 0;
-        pos++;
-    }
-
-    buffer[size] = (String) {NULL, 1};
+    buffer[lineSize] = (String) {NULL, 0};
     free(file.str);
-    return buffer;
-}
 
-char *newBinarySheet(String *file)
-{
-    size_t i = 0;
-    size_t size = 0; 
-    while (file[i].str)
-    {   
-        size++;
-        i++;
-    }
-    size = size * 17;
-    char *buffer = malloc(size);
-    if (buffer == NULL) {perror("newBinarySheet: malloc"); return NULL;}
 
-    for (i = 0; i < size - 1; i++)
+    // Assembler step 2 output
+    FILE *fp = fopen("..\\.AssemblerSteps\\2-extInstruction.asm", "w");
+    if(!fp) return buffer;
+    int which = 0;
+    size_t outindx = 0;
+    while (buffer[outindx].str)
     {
-        if(i % 17 == 16)
-            buffer[i] = '\n';
+        size_t inerindx = 0;
+        fprintf(fp, "[");
+        while(buffer[outindx].str[inerindx])
+        {
+            if(buffer[outindx].str[0] == '@')
+                which = 1;
+            else if(buffer[outindx].str[0] == '(')
+                which = 2;
+            fprintf(fp, "%c", buffer[outindx].str[inerindx]);
+            inerindx++;
+        }
+        if(which ==1)
+            fprintf(fp, "] -> //A instruction\n");
+        else if(which == 2)
+            fprintf(fp, "] -> //Label\n");
         else
-            buffer[i] = '0';
+            fprintf(fp, "] -> //C instruction\n");
+        outindx++;
+        which = 0;
     }
-    buffer[size - 1] = '\0';
+    fclose(fp);
+
+
+    return buffer; 
+}
+
+int isdigits(const char *string)
+{
+    if (!string || !*string) return -1;
+    if (!string) return -1;
+    errno = 0;
+    char *end;
+    unsigned long num = strtoul(string, &end, 10);
+
+    if (end == string) return -1;            // no digits
+    if (*end != '\0') return -1;            // trailing junk
+    if (errno == ERANGE) return -1;            // overflow
+    if (num > 65535UL) return -1;            // beyond uint16_t
+
+    return (int) num;
+}
+
+int isValideLabel(const char *string)
+{
+    if (!string || !*string) return 0;
+    // check leading char's
+    if(!((string[0] >= 'a' && string[0] <= 'z') || (string[0] >= 'A' && string[0] <= 'Z') || string[0] == '_' || string[0] == '.'  || string[0] == '$' || string[0] == ':'))
+        return 0;
+    for (size_t i = 1; string[i]; i++)
+    {
+        if(!((string[i] >= 'a' && string[i] <= 'z') || (string[i] >= 'A' && string[i] <= 'Z') || (string[i] >= '0' && string[i] <= '9') || string[i] == '_' || string[i] == '.'  || string[i] == '$' || string[i] == ':'))
+            return 0;
+    }
+    return 1;
+}
+
+String *extLabel(String *file, LinkedList *list)
+{
+    size_t linesSize = 0;
+    while (file[linesSize].str)
+        linesSize++;
+    
+    String *buffer = malloc((linesSize + 1) * sizeof *buffer);
+    if(!buffer) {perror("extLabel(malloc)"); return NULL;}
+
+    char *filelineChar;
+    size_t  bufferlinesSize = 0, filelineSize = 0, offline = 0;
+
+    for (size_t fileline = 0; file[fileline].str; fileline++)
+    {
+        filelineChar = file[fileline].str;
+        filelineSize = file[fileline].size;
+
+        if(filelineChar[0] == '(')
+        {
+            if (filelineChar[filelineSize - 1] != ')') {fprintf(stderr, "Label Syntax Error (line %zu:%zu): %s <- missing ')'\n", fileline + 1, filelineSize, filelineChar); 
+                                                        while(bufferlinesSize){free(buffer[--bufferlinesSize].str);} free(buffer); return NULL;}
+            if (filelineSize < 4) {fprintf(stderr, "Label Empty Error (line %zu:%zu): %s you need to have at least (x)\n", fileline + 1, filelineSize, filelineChar); 
+                                   while(bufferlinesSize){free(buffer[--bufferlinesSize].str);} free(buffer); return NULL;}
+            // terminate and check lable validity
+            filelineChar[filelineSize - 1] = '\0';
+            if(!isValideLabel(filelineChar + 1)) {fprintf(stderr, "Label Syntax Error (line %zu:%zu): %s invalid character('s) label must obey the regex general rule ^[A-Za-z_.$:][A-Za-z0-9_.$:]*$\n", 
+                                                  fileline + 1, filelineSize, filelineChar); return NULL;}
+            // we need because we remove 2 from filelineSize and allocation start at 1 so (filelineSize - 2 + 1)
+            char *str = malloc(filelineSize - 1);
+            if(!str){perror("extLabel(malloc)"); while(bufferlinesSize){free(buffer[--bufferlinesSize].str);} free(buffer); return NULL;}
+            // copy the string without pranthesize
+            memcpy(str, filelineChar + 1, filelineSize - 1);
+            addNode(list,(Pair) {str, fileline - offline + 1});
+            offline++;
+            continue;
+        }
+        // mallocating fo each buffer new line
+        buffer[bufferlinesSize].str = malloc(filelineSize + 1);
+        char *bufferlineChar = buffer[bufferlinesSize].str;
+        if(!bufferlineChar) {perror("extLabel(malloc)"); while(bufferlinesSize){free(buffer[--bufferlinesSize].str);} free(buffer); return NULL;}
+        
+        // copy and terminate and incriment for next line
+        memcpy(bufferlineChar, filelineChar, filelineSize);
+        bufferlineChar[filelineSize] = '\0';
+        buffer[bufferlinesSize].size = filelineSize;
+        bufferlinesSize++;
+    }
+    String *tmp = realloc(buffer, (bufferlinesSize + 1) * sizeof *buffer);
+    if (!tmp) {perror("extLabel(realloc)"); while(bufferlinesSize){free(buffer[--bufferlinesSize].str);} free(buffer); return NULL;}
+    buffer = tmp;
+    buffer[bufferlinesSize] = (String) {NULL, 0};
+    size_t indx = 0;
+    while (file[indx].str)
+    {
+        free(file[indx++].str);
+    }
+    free(file);
+    
+
+    // Assembler step 3-1 output
+    FILE *fp = fopen("..\\.AssemblerSteps\\3-1-extLabel.asm", "w");
+    if(!fp) return buffer;
+    fprintLinkedList(list);
+    int which = 0;
+    size_t outindx = 0;
+    while (buffer[outindx].str)
+    {
+        size_t inerindx = 0;
+        fprintf(fp, "[");
+        while(buffer[outindx].str[inerindx])
+        {
+            if(buffer[outindx].str[0] == '@')
+                which = 1;
+            fprintf(fp, "%c", buffer[outindx].str[inerindx]);
+            inerindx++;
+        }
+        if(which ==1)
+            fprintf(fp, "] -> //A instruction\n");
+        else
+            fprintf(fp, "] -> //C instruction\n");
+        outindx++;
+        which = 0;
+    }
+    fclose(fp);
+
+
     return buffer;
 }
 
-int Ainstruction(const String *file, char *buffer, int line) // line is wich instruction line we are on offset
-{ 
-    size_t count = 0;
-    size_t offset = line * 17;
-    char *end = NULL;
-    errno = 0;
-    size_t num = (size_t) strtol(file[line].str + 1, &end, 10);
-
-    if (end == file[line].str + 1) {fprintf(stderr, "line %d: %s A-instruction Error: no digit found!\n", line, file[line].str); return -1;}              // no digits
-    if (errno == ERANGE) {fprintf(stderr, "line %d: %s A-instruction Error: out of long range!\n", line, file[line].str); return -1;}        // out of long range
-    if (*end != '\0') {fprintf(stderr, "line %d: %s A-instruction Error: not a number!\n", line, file[line].str); return -1;}           // trailing junk (e.g., "123abc")
-    if (num > 32767) {fprintf(stderr, "line %d: %s A-instruction Error: out of bound! (address must be 0..32767)\n", line, file[line].str); return -1;} // Hack A-instr range
-
+// you need to do line + 1
+char *Ainstruction(LinkedList *list, const String line, const size_t numline)
+{
+    char *buffer = malloc(17), *end = NULL;
+    if (!buffer) {perror("Ainstruction(malloc)"); return NULL;}
+    for (size_t i = 0; i < 16; i++) buffer[i] = '0';
+    buffer[16] = '\0';
+    
+    size_t count = 0, num = 0;
+    if(isdigits(line.str + 1) != -1)
+    {
+        errno = 0;
+        num = (size_t) strtol(line.str + 1, &end, 10);
+        if (errno == ERANGE) {fprintf(stderr, "line %zu: %s A-instruction Error: out of long range!\n", numline, line.str + 1); return NULL;}        // out of long range
+        if (num > 32767) {fprintf(stderr, "line %zu: %s A-instruction Error: out of bound! (address must be 0..32767)\n", numline, line.str + 1); return NULL;} // Hack A-instr range
+    }
+    else if(isValideLabel(line.str + 1))
+    {
+        int search = searchLinkedList(list, line.str + 1);
+        if(search == -1)
+        {
+            char *bufferNode = malloc(line.size + 1);
+            if (!bufferNode) {perror("Ainstruction(malloc)"); return NULL;}
+            memcpy(bufferNode, line.str + 1, line.size + 1);
+            addNode(list, (Pair){bufferNode, var++});
+        }
+        num = searchLinkedList(list, line.str + 1);
+    }
+    else
+    {fprintf(stderr, "line %zu: A-instruction Syntax Error: (%s) Invalid name for A variable \n", numline, line.str + 1); return NULL;} // Hack A-instr range
     while (num != 0)
     {
-        buffer[15 + offset - count] = (char) ('0' + num % 2);
+        buffer[15 - count] = (char) ('0' + (num % 2));
         num /= 2;
         count++;
     }
-    return 0;
+    return buffer;
 }
 
-int Cinstruction(const String *file, char *buffer, int line)
+char *Cinstruction(String line, const size_t numline)
 {
-    const int offset = line * 17;
-
-    /* make a writable copy of the line */
-    char *str = (char *)malloc(file[line].size + 1);
-    if (!str) { perror("Cinstruction: malloc"); return -1; }
-    memcpy(str, file[line].str, file[line].size + 1);
+    char *buffer = malloc(17);
+    if (!buffer) {perror("Cinstruction(malloc)"); return NULL;}
+    for (size_t i = 0; i < 16; i++) buffer[i] = '0';
+    buffer[16] = '\0';
 
     char *dest = NULL, *comp = NULL, *jmp = NULL;
-
-    int pos = find_pos(str, '=');
-    if (pos != -1) {
-        str[pos] = '\0';
-        dest = str;
-        comp = str + pos + 1;
-    } else {
-        comp = str;
+    int pos;
+    if((pos = find_pos(line.str, '=')) != -1)
+    {
+        dest = line.str;
+        comp = line.str + pos + 1;
+        line.str[pos] = '\0';
+    }
+    else
+    {comp = line.str;}
+    if ((pos = find_pos(line.str, ';')) != -1)
+    {
+        jmp = line.str + pos + 1;
+        line.str[pos] = '\0';
+    }
+    
+    int compindx = 0;
+    while (compmap[compindx].instrcuction && strcmp(compmap[compindx].instrcuction, comp) != 0) compindx++;
+    if(!compmap[compindx].instrcuction){fprintf(stderr, "line %zu: %s C-instruction Error: There is no computation opcode %s !\n", numline, line.str, comp); free(buffer); return NULL;}
+        
+    int destindx = 0;
+    if(dest)
+    {
+        while (destmap[destindx].instrcuction && strcmp(destmap[destindx].instrcuction, dest) != 0) destindx++;
+        if(!destmap[destindx].instrcuction){fprintf(stderr, "line %zu: %s C-instruction Error: There is no destination opcode %s !\n", numline, line.str, dest); free(buffer); return NULL;}
     }
 
-    pos = find_pos(comp, ';');
-    if (pos != -1) {
-        comp[pos] = '\0';
-        jmp = comp + pos + 1;
+    int jmpindx = 0;
+    if(jmp)
+    {
+        while (jmpmap[jmpindx].instrcuction && strcmp(jmpmap[jmpindx].instrcuction, jmp) != 0) jmpindx++;
+        if(!jmpmap[jmpindx].instrcuction){fprintf(stderr, "line %zu: %s C-instruction Error: There is no jump opcode %s !\n", numline, line.str, jmp); free(buffer); return NULL;}
     }
-
-    /* --- write comp (10 bits) to bits 15..6 --- */
-    int index = 0;
-    while (compmap[index].opc && strcmp(comp, compmap[index].opc) != 0) index++;
-    if (!compmap[index].opc) {
-        fprintf(stderr, "line %d: %s C-instruction Error: There is no comp opcode %s !\n",
-                line, file[line].str, comp);
-        free(str); return -1;
-    }
-    /* compmap bits[0..9] go to buffer[offset+15..offset+6] */
-    for (int i = 0; i < 10; ++i)
-        buffer[offset + 15 - i] = compmap[index].bits[i];
-
-    /* --- write dest (3 bits) to bits 5..3 --- */
-    if (dest) {
-        index = 0;
-        while (destmap[index].opc && strcmp(dest, destmap[index].opc) != 0) index++;
-        if (!destmap[index].opc) {
-            fprintf(stderr, "line %d: %s C-instruction Error: There is no dest opcode %s !\n",
-                    line, file[line].str, dest);
-            free(str); return -1;
-        }
-        /* bits order d1 d2 d3 -> positions 5,4,3 */
-        buffer[offset + 5] = destmap[index].bits[0];
-        buffer[offset + 4] = destmap[index].bits[1];
-        buffer[offset + 3] = destmap[index].bits[2];
-    } else {
-        buffer[offset + 5] = '0';
-        buffer[offset + 4] = '0';
-        buffer[offset + 3] = '0';
-    }
-
-    /* --- write jmp (3 bits) to bits 2..0 --- */
-    if (jmp) {
-        index = 0;
-        while (jmpmap[index].opc && strcmp(jmp, jmpmap[index].opc) != 0) index++;
-        if (!jmpmap[index].opc) {
-            fprintf(stderr, "line %d: %s C-instruction Error: There is no jmp opcode %s !\n",
-                    line, file[line].str, jmp);
-            free(str); return -1;
-        }
-        buffer[offset + 2] = jmpmap[index].bits[0];
-        buffer[offset + 1] = jmpmap[index].bits[1];
-        buffer[offset + 0] = jmpmap[index].bits[2];
-    } else {
-        buffer[offset + 2] = '0';
-        buffer[offset + 1] = '0';
-        buffer[offset + 0] = '0';
-    }
-
-    free(str);
-    return 0;
+    
+    for (size_t cindx = 0; cindx < 10; cindx++)
+        buffer[cindx] = compmap[compindx].value[cindx];
+    for (size_t dindx = 0; dindx < 3; dindx++)
+        buffer[dindx + 10] = destmap[destindx].value[dindx];
+    for (size_t jindx = 0; jindx < 3; jindx++)
+        buffer[jindx + 13] = jmpmap[jmpindx].value[jindx];
+    
+    return buffer;
 }
 
-
-int hackAssembler(const char *inpath, const char *outpath){
+int hackAssembler(const char *inpath, const char *outpath)
+{
+    FILE *fp = fopen(outpath, "w");
+    if(!fp)
+        return -1;
     LinkedList *list = newLinkedList();
-    String extfile = extFile(inpath);
-    if(extfile.str == NULL)
+    if(!list)
         return -1;
-    String rmcomment = rmComment(extfile);
-    if(rmcomment.str == NULL)
+    for (size_t i = 0; i < 23; i++)
+        addNode(list, preSymboles[i]);
+    String extasmfile = extASMFile(inpath);
+    if (!extasmfile.str)
         return -1;
-    String rmemptyspace = rmEmptySpace(rmcomment);
-    if(rmemptyspace.str == NULL)
+    String trimasmfile = trimASMFile(extasmfile);
+    if (!trimasmfile.str)
         return -1;
-    String extlabel = extLabel(rmemptyspace ,list);
-    if(extlabel.str == NULL)
+    String *extinstruction = extInstruction(trimasmfile);
+    if(!extinstruction)
         return -1;
-    String convlabel = convLabel(extlabel ,list);
-    if(convlabel.str == NULL)
+    String *file = extLabel(extinstruction, list);
+    if(!file)
         return -1;
-    String *file = extInstruction(convlabel);
-    if(file->str == NULL)
-        return -1;
-    char *buffer = newBinarySheet(file);
-    if(buffer == NULL)
-        return -1;
-    int i = 0;
-    while (file[i].str)
+    int indx = 0;
+    while (file[indx].str)
+        indx++;
+    
+    char *buffer = malloc(17 * indx);
+    if (!buffer) {perror("Cinstruction(malloc)"); return -1;}
+
+    size_t writeSize = 17 * indx;
+    indx = 0;
+    char *str;
+    while (file[indx].str)
     {
-        if(file[i].str[0] == '@')
+        if(file[indx].str[0] == '@')
         {
-            if(Ainstruction(file, buffer, i)){ return 1;}
+            str = Ainstruction(list, file[indx], indx + 1);
         }
         else
         {
-            if(Cinstruction(file, buffer, i)){ return 1;}
+            str = Cinstruction(file[indx], indx + 1);
         }
-        i++;
+        if(!str)
+            return -1;
+        size_t destindx = 0;
+        while (str[destindx])
+        {
+            buffer[indx * 17 + destindx] = str[destindx];
+            destindx++;
+        }
+            buffer[indx * 17 + destindx] = '\n';
+        indx++;
     }
-    FILE *fp = fopen(outpath, "w");
-    if(fp == NULL)
-    {perror("hackAssembler"); return -1;}
-    fprintf(fp, "%s", buffer);
-    fclose(fp);
-    freeExtInst(file);
-    return 0;
-}
-
-void freeExtInst(String *file){
-    int j = 0;
-    while (file[j].str)
-    {
-        free(file[j++].str);
-    }
+    fwrite(buffer, 1, writeSize - 1, fp);
+    indx = 0;
+    while (file[indx].str) {free(file[indx].str); indx++;}
     free(file);
+    fclose(fp);
+
+    // Assembly step 5 output
+    FILE *fptmp = fopen("../.AssemblerSteps/4-out.hack", "w");
+    fwrite(buffer, 1, writeSize - 1, fptmp);
+    fclose(fptmp);
+
+    free(buffer);
+    freeDeepLinkedList(&list);
+    return 0;
 }
