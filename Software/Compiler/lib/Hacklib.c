@@ -397,13 +397,13 @@ String *extLabel(String *file, LinkedList *list)
 
         if(filelineChar[0] == '(')
         {
-            if (filelineChar[filelineSize - 1] != ')') {fprintf(stderr, "Label Syntax Error (line %zu:%zu): %s <- missing ')'\n", fileline + 1, filelineSize, filelineChar); 
+            if (filelineChar[filelineSize - 1] != ')') {fprintf(stderr, "(FILE: ../.AssemblerSteps/2-extLabel.asm) Label Syntax Error (line %zu:%zu): %s <- missing ')'\n", fileline + 1, filelineSize, filelineChar); 
                                                         while(bufferlinesSize){free(buffer[--bufferlinesSize].str);} free(buffer); return NULL;}
-            if (filelineSize < 4) {fprintf(stderr, "Label Empty Error (line %zu:%zu): %s you need to have at least (x)\n", fileline + 1, filelineSize, filelineChar); 
+            if (filelineSize < 4) {fprintf(stderr, "(FILE: ../.AssemblerSteps/2-extLabel.asm) Label Empty Error (line %zu:%zu): %s you need to have at least (x)\n", fileline + 1, filelineSize, filelineChar); 
                                    while(bufferlinesSize){free(buffer[--bufferlinesSize].str);} free(buffer); return NULL;}
             // terminate and check lable validity
             filelineChar[filelineSize - 1] = '\0';
-            if(!isValideLabel(filelineChar + 1)) {fprintf(stderr, "Label Syntax Error (line %zu:%zu): %s invalid character('s) label must obey the regex general rule ^[A-Za-z_.$:][A-Za-z0-9_.$:]*$\n", 
+            if(!isValideLabel(filelineChar + 1)) {fprintf(stderr, "(FILE: ../.AssemblerSteps/2-extLabel.asm) Label Syntax Error (line %zu:%zu): %s invalid character('s) label must obey the regex general rule ^[A-Za-z_.$:][A-Za-z0-9_.$:]*$\n", 
                                                   fileline + 1, filelineSize, filelineChar); return NULL;}
             // we need because we remove 2 from filelineSize and allocation start at 1 so (filelineSize - 2 + 1)
             char *str = malloc(filelineSize - 1);
@@ -440,7 +440,6 @@ String *extLabel(String *file, LinkedList *list)
     // Assembler step 3-1 output
     FILE *fp = fopen("..\\.AssemblerSteps\\3-1-extLabel.asm", "w");
     if(!fp) return buffer;
-    fprintLinkedList(list);
     int which = 0;
     size_t outindx = 0;
     while (buffer[outindx].str)
@@ -480,8 +479,8 @@ char *Ainstruction(LinkedList *list, const String line, const size_t numline)
     {
         errno = 0;
         num = (size_t) strtol(line.str + 1, &end, 10);
-        if (errno == ERANGE) {fprintf(stderr, "line %zu: %s A-instruction Error: out of long range!\n", numline, line.str + 1); return NULL;}        // out of long range
-        if (num > 32767) {fprintf(stderr, "line %zu: %s A-instruction Error: out of bound! (address must be 0..32767)\n", numline, line.str + 1); return NULL;} // Hack A-instr range
+        if (errno == ERANGE) {fprintf(stderr, "(FILE: ../.AssemblerSteps/3-1-extLabel.asm) line %zu: %s A-instruction Error: out of long range!\n", numline, line.str + 1); return NULL;}        // out of long range
+        if (num > 32767) {fprintf(stderr, "(FILE: ../.AssemblerSteps/3-1-extLabel.asm) line %zu: %s A-instruction Error: out of bound! (address must be 0..32767)\n", numline, line.str + 1); return NULL;} // Hack A-instr range
     }
     else if(isValideLabel(line.str + 1))
     {
@@ -496,7 +495,7 @@ char *Ainstruction(LinkedList *list, const String line, const size_t numline)
         num = searchLinkedList(list, line.str + 1);
     }
     else
-    {fprintf(stderr, "line %zu: A-instruction Syntax Error: (%s) Invalid name for A variable \n", numline, line.str + 1); return NULL;} // Hack A-instr range
+    {fprintf(stderr, "(FILE: ../.AssemblerSteps/3-1-extLabel.asm) line %zu: A-instruction Syntax Error: (%s) Invalid name for A variable \n", numline, line.str + 1); return NULL;} // Hack A-instr range
     while (num != 0)
     {
         buffer[15 - count] = (char) ('0' + (num % 2));
@@ -531,20 +530,20 @@ char *Cinstruction(String line, const size_t numline)
     
     int compindx = 0;
     while (compmap[compindx].instrcuction && strcmp(compmap[compindx].instrcuction, comp) != 0) compindx++;
-    if(!compmap[compindx].instrcuction){fprintf(stderr, "line %zu: %s C-instruction Error: There is no computation opcode %s !\n", numline, line.str, comp); free(buffer); return NULL;}
+    if(!compmap[compindx].instrcuction){fprintf(stderr, "(FILE: ../.AssemblerSteps/3-1-extLabel.asm) line %zu: %s C-instruction Error: There is no computation opcode %s !\n", numline, line.str, comp); free(buffer); return NULL;}
         
     int destindx = 0;
     if(dest)
     {
         while (destmap[destindx].instrcuction && strcmp(destmap[destindx].instrcuction, dest) != 0) destindx++;
-        if(!destmap[destindx].instrcuction){fprintf(stderr, "line %zu: %s C-instruction Error: There is no destination opcode %s !\n", numline, line.str, dest); free(buffer); return NULL;}
+        if(!destmap[destindx].instrcuction){fprintf(stderr, "(FILE: ../.AssemblerSteps/3-1-extLabel.asm) line %zu: %s C-instruction Error: There is no destination opcode %s !\n", numline, line.str, dest); free(buffer); return NULL;}
     }
 
     int jmpindx = 0;
     if(jmp)
     {
         while (jmpmap[jmpindx].instrcuction && strcmp(jmpmap[jmpindx].instrcuction, jmp) != 0) jmpindx++;
-        if(!jmpmap[jmpindx].instrcuction){fprintf(stderr, "line %zu: %s C-instruction Error: There is no jump opcode %s !\n", numline, line.str, jmp); free(buffer); return NULL;}
+        if(!jmpmap[jmpindx].instrcuction){fprintf(stderr, "(FILE: ../.AssemblerSteps/3-1-extLabel.asm) line %zu: %s C-instruction Error: There is no jump opcode %s !\n", numline, line.str, jmp); free(buffer); return NULL;}
     }
     
     for (size_t cindx = 0; cindx < 10; cindx++)
@@ -615,6 +614,7 @@ int hackAssembler(const char *inpath, const char *outpath)
     while (file[indx].str) {free(file[indx].str); indx++;}
     free(file);
     fclose(fp);
+    fprintLinkedList(list);
 
     // Assembly step 5 output
     FILE *fptmp = fopen("../.AssemblerSteps/4-out.hack", "w");

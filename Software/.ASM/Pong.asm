@@ -1,94 +1,29 @@
-// This file is part of www.nand2tetris.org
-// and the book "The Elements of Computing Systems"
-// by Nisan and Schocken, MIT Press.
-// File name: projects/6/pong/Pong.asm
+@5              // load constant 5
+D=A             // D = 5
+@LCL            // base of current frame
+A=M-D           // A = LCL - 5          (points to return address slot)
+D=M             // D = *(LCL - 5)       (RET)
+@R13            // temp register for RET
+M=D             // R13 = RET
 
-// This Pong game code was originally written in the high-level Jack language.
-// The Jack code was then translated by the Jack compiler into VM code.
-// The VM code was then translated by the VM translator into the Hack
-// assembly code shown here. The variable and label symbols were generated
-// automatically by the translators. This information is given for context only.
-// Jack, the Jack compiler, and the VM translator are covered in Part II
-// of the course, and are irrelevant for project 6.
+@SP
+AM=M-1          // SP-- ; A = SP
+D=M          // D = *SP               (return value)
 
-@256
-D=A
-@SP
-M=D
-@133
-0;JMP
-@R15
-M=D
-@SP
-AM=M-1
-D=M
-A=A-1
-D=M-D
-M=0
-@END_EQ
-D;JNE
-@SP
-A=M-1
-M=-1
-(END_EQ)
-@R15
-A=M
-0;JMP
-@R15
-M=D
-@SP
-AM=M-1
-D=M
-A=A-1
-D=M-D
-M=0
-@END_GT
-D;JLE
-@SP
-A=M-1
-M=-1
-(END_GT)
-@R15
-A=M
-0;JMP
-@R15
-M=D
-@SP
-AM=M-1
-D=M
-A=A-1
-D=M-D
-M=0
-@END_LT
-D;JGE
-@SP
-A=M-1
-M=-1
-(END_LT)
-@R15
-A=M
-0;JMP
-@5
-D=A
-@LCL
-A=M-D
-D=M
-@R13
-M=D
-@SP
-AM=M-1
-D=M
 @ARG
-A=M
-M=D
-D=A
+A=M             // A = ARG
+M=D             // *ARG = return value
+
+D=A             // D = ARG
 @SP
-M=D+1
+M=D+1           // SP = ARG + 1
+
 @LCL
-D=M
+D=M             // D = LCL               (FRAME = LCL)
 @R14
-AM=D-1
-D=M
+AM=D-1          // R14 = LCL-1 ; A = LCL-1  (step to THAT slot)
+D=M             // D = *(LCL - 1)        (THAT)
+
 @THAT
 M=D
 @R14
