@@ -410,7 +410,7 @@ String *extLabel(String *file, LinkedList *list)
             if(!str){perror("extLabel(malloc)"); while(bufferlinesSize){free(buffer[--bufferlinesSize].str);} free(buffer); return NULL;}
             // copy the string without pranthesize
             memcpy(str, filelineChar + 1, filelineSize - 1);
-            addNode(list,(Pair) {str, fileline - offline + 1});
+            addNode(list,(Pair) {str, fileline - offline});
             offline++;
             continue;
         }
@@ -531,12 +531,16 @@ char *Cinstruction(String line, const size_t numline)
     int compindx = 0;
     while (compmap[compindx].instrcuction && strcmp(compmap[compindx].instrcuction, comp) != 0) compindx++;
     if(!compmap[compindx].instrcuction){fprintf(stderr, "(FILE: ../.AssemblerSteps/3-1-extLabel.asm) line %zu: %s C-instruction Error: There is no computation opcode %s !\n", numline, line.str, comp); free(buffer); return NULL;}
-        
+    for (size_t cindx = 0; cindx < 10; cindx++)
+    buffer[cindx] = compmap[compindx].value[cindx];
+
     int destindx = 0;
     if(dest)
     {
         while (destmap[destindx].instrcuction && strcmp(destmap[destindx].instrcuction, dest) != 0) destindx++;
         if(!destmap[destindx].instrcuction){fprintf(stderr, "(FILE: ../.AssemblerSteps/3-1-extLabel.asm) line %zu: %s C-instruction Error: There is no destination opcode %s !\n", numline, line.str, dest); free(buffer); return NULL;}
+        for (size_t dindx = 0; dindx < 3; dindx++)
+        buffer[dindx + 10] = destmap[destindx].value[dindx];
     }
 
     int jmpindx = 0;
@@ -544,50 +548,43 @@ char *Cinstruction(String line, const size_t numline)
     {
         while (jmpmap[jmpindx].instrcuction && strcmp(jmpmap[jmpindx].instrcuction, jmp) != 0) jmpindx++;
         if(!jmpmap[jmpindx].instrcuction){fprintf(stderr, "(FILE: ../.AssemblerSteps/3-1-extLabel.asm) line %zu: %s C-instruction Error: There is no jump opcode %s !\n", numline, line.str, jmp); free(buffer); return NULL;}
+        for (size_t jindx = 0; jindx < 3; jindx++)
+        buffer[jindx + 13] = jmpmap[jmpindx].value[jindx];
     }
     
-    for (size_t cindx = 0; cindx < 10; cindx++)
-        buffer[cindx] = compmap[compindx].value[cindx];
-    for (size_t dindx = 0; dindx < 3; dindx++)
-        buffer[dindx + 10] = destmap[destindx].value[dindx];
-    for (size_t jindx = 0; jindx < 3; jindx++)
-        buffer[jindx + 13] = jmpmap[jmpindx].value[jindx];
-    
+
     return buffer;
 }
 
-int hackAssembler(const char *inpath, const char *outpath)
+String hackAssembler(const char *inpath)
 {
-    FILE *fp = fopen(outpath, "w");
-    if(!fp)
-        return -1;
     LinkedList *list = newLinkedList();
+    String out = (String) {NULL, 0};
     if(!list)
-        return -1;
+        return out;
     for (size_t i = 0; i < 23; i++)
         addNode(list, preSymboles[i]);
     String extasmfile = extASMFile(inpath);
     if (!extasmfile.str)
-        return -1;
+        return out;
     String trimasmfile = trimASMFile(extasmfile);
     if (!trimasmfile.str)
-        return -1;
+        return out;
     String *extinstruction = extInstruction(trimasmfile);
     if(!extinstruction)
-        return -1;
+        return out;
     String *file = extLabel(extinstruction, list);
     if(!file)
-        return -1;
-    int indx = 0;
-    while (file[indx].str)
-        indx++;
+        return out;
+    size_t lines = 0;
+    while (file[lines].str)
+        lines++;
     
-    char *buffer = malloc(17 * indx);
-    if (!buffer) {perror("Cinstruction(malloc)"); return -1;}
+    char *buffer = malloc(17 * lines);
+    if (!buffer) {perror("Cinstruction(malloc)"); return out;}
 
-    size_t writeSize = 17 * indx;
-    indx = 0;
     char *str;
+    size_t writeSize = 17 * lines, indx = 0;
     while (file[indx].str)
     {
         if(file[indx].str[0] == '@')
@@ -599,7 +596,7 @@ int hackAssembler(const char *inpath, const char *outpath)
             str = Cinstruction(file[indx], indx + 1);
         }
         if(!str)
-            return -1;
+            return out;
         size_t destindx = 0;
         while (str[destindx])
         {
@@ -609,19 +606,50 @@ int hackAssembler(const char *inpath, const char *outpath)
             buffer[indx * 17 + destindx] = '\n';
         indx++;
     }
-    fwrite(buffer, 1, writeSize - 1, fp);
-    indx = 0;
-    while (file[indx].str) {free(file[indx].str); indx++;}
+    size_t freeindx = 0;
+    while (file[freeindx].str) {free(file[freeindx].str); freeindx++;}
     free(file);
-    fclose(fp);
     fprintLinkedList(list);
-
-    // Assembly step 5 output
-    FILE *fptmp = fopen("../.AssemblerSteps/4-out.hack", "w");
-    fwrite(buffer, 1, writeSize - 1, fptmp);
-    fclose(fptmp);
-
-    free(buffer);
     freeDeepLinkedList(&list);
-    return 0;
+    return (String) {buffer, writeSize};
+}
+
+String convToHex(const String file)
+{
+    // Expect each line: 16 bits + '\n' => 17 bytes
+    size_t lines = file.size / 17;
+    String buffer = (String){ malloc(lines * 5 + 1), lines * 5 };
+    if (!buffer.str) { perror("convToHex(malloc)"); return (String){NULL,0}; }
+
+    char binnum[4][5];
+    char hexnum[5];
+
+    for (size_t index = 0; index < lines; ++index) {
+        size_t base = index * 17;
+
+        // Build 4 nibbles (each 4 chars) from the 16-bit line
+        for (size_t jndx = 0; jndx < 4; ++jndx) {
+            for (size_t kndx = 0; kndx < 4; ++kndx)
+                binnum[jndx][kndx] = file.str[base + jndx*4 + kndx];
+            binnum[jndx][4] = '\0';
+
+            // Lookup nibble → hex
+            int m = 0;
+            for (; m < 16; ++m)
+                if (strcmp(hexNumber[m].key, binnum[jndx]) == 0) {
+                    hexnum[jndx] = hexNumber[m].value;
+                    break;
+                }
+            if (m == 16) hexnum[jndx] = '?'; // fallback if malformed input
+        }
+
+        hexnum[4] = '\n';
+
+        // Copy 4 hex chars + '\n'
+        for (size_t j = 0; j < 5; ++j)
+            buffer.str[index * 5 + j] = hexnum[j];
+    }
+
+    buffer.str[lines * 5] = '\0';
+    return buffer;
 }

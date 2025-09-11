@@ -181,4 +181,3 @@ Binary: `111 0 101010 000 111` → `1110101010000111`
 * Only **decimal** numbers are used in `@value`. Range: **0..32767**.
 * The assembler resolves symbols in **two passes**: first collects labels (ROM addresses), then resolves A-instruction symbols (labels + predefined + variables).
 * Variables start at **address 16** unless you predefine them.
-

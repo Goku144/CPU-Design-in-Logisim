@@ -1585,3 +1585,81 @@ make: 'bin/HackAssembler' is up to date.
 make: 'bin/HackAssembler' is up to date.
 [Wed 09/10/2025  8:21:22.42]  
 make: 'bin/HackAssembler' is up to date.
+[Wed 09/10/2025 18:46:52.33]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Wed 09/10/2025 18:47:44.38]  
+make: 'bin/HackAssembler' is up to date.
+[Wed 09/10/2025 19:09:59.91]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Wed 09/10/2025 19:27:11.64]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Wed 09/10/2025 23:34:44.39]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Wed 09/10/2025 23:35:10.83]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Wed 09/10/2025 23:41:12.52]  
+make: 'bin/HackAssembler' is up to date.
+[Thu 09/11/2025  0:49:33.97]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  2:47:00.60]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  2:51:41.35]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  2:56:27.73]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:05:01.79]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:06:06.77]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:06:20.68]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:07:16.58]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:07:31.33]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:07:54.99]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:15:42.50]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:16:27.08]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:17:14.21]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:17:34.92]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:18:22.79]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:18:38.94]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:24:25.93]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:24:41.89]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:27:08.95]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:34:24.41]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:36:44.05]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:38:43.62]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:41:49.52]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:43:35.44]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:52:17.22]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:53:10.02]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  3:53:54.27]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  4:00:56.60]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  4:04:19.43]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  4:04:52.89]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  4:07:36.42]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  4:11:43.07]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler

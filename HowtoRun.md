@@ -1,34 +1,56 @@
 # How to Run the Hack Assembler (Windows)
 
-The assembler binary is placed at:  
-`Software/Compiler/bin/HackAssembler.exe`
+**Binary:** `Software/Compiler/bin/HackAssembler.exe`
 
-## Quick Steps
+## CLI
 
-1) **Run setup once (installs deps + builds)**
-   - Open VS Code in the repo (`CPU-Design-in-Logisim`), press **Ctrl+J** to open the terminal.
-   - Run:
-     ```bat
-     py -3 .\Software\Compiler\setup.py
-     ```
-     *(or `python .\Software\Compiler\setup.py`)*
+```text
+HackAssembler <input.asm> ([-o <name>] | [-h <name>] | [-b <name>])
+```
 
-2) **Assemble a file**
-   - Go to the compiler folder:
-     ```bat
-     cd .\Software\Compiler
-     ```
-   - Run the assembler:
-     ```bat
-     .\bin\HackAssembler ..\.ASM\file.asm ..\.HACK\file.hack
-     ```
-   - **Rule:**  
-     ```bat
-     .\bin\HackAssembler <input.asm> <output.hack>
-     ```
-     Make sure the **output folder exists** (create it if needed).
+### Options
 
-### Examples
+* `-o <name>` → writes to `..\.HACK\<name>.hack`
+* `-h <name>` → writes to `..\.HEX\<name>.hex`
+* `-b <name>` → writes **both**:
+
+  * `..\.HACK\<name>.hack`
+  * `..\.HEX\<name>.hex`
+
+> **Important:** `<name>` is a **base name only** (no folders).
+> Don’t pass paths like `..\.HACK\Name` or `..\some\path\Name` — the program already prepends the right folder.
+> Extensions are auto-added (case-insensitive). If you pass them (e.g., `Name.hack`), they won’t be duplicated.
+
+## Examples
+
 ```bat
-mkdir .\.HACK 2>nul
-.\bin\HackAssembler ..\.ASM\Pong.asm .\.HACK\Pong.hack
+cd .\Software\Compiler
+
+:: Assemble Pong to HACK (.hack text)
+.\bin\HackAssembler ..\.ASM\Pong.asm -o Pong
+
+:: Convert to HEX (.hex text)
+.\bin\HackAssembler ..\.ASM\Pong.asm -h Pong
+
+:: Do both at once
+.\bin\HackAssembler ..\.ASM\Pong.asm -b Pong
+```
+
+**This produces:**
+
+```
+..\.HACK\Pong.hack
+..\.HEX\Pong.hex
+```
+
+> The tool creates `..\.HACK\` and `..\.HEX\` automatically if they don’t exist.
+
+## Common Pitfalls
+
+* **Using a path in `<name>`**
+  `-o ..\.HACK\Pong` ⇒ results in `..\.HACK\..\.HACK\Pong.hack` (wrong).
+  Use `-o Pong` instead.
+
+* **Old (deprecated) usage**
+  Previous docs showed: `HackAssembler <input.asm> <output.hack>`
+  Now you must use one of `-o`, `-h`, or `-b` as above.
