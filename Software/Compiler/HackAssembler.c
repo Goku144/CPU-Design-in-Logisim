@@ -29,9 +29,8 @@ static int write_all(const char *path, const char *buf, size_t n) {
     return 0;
 }
 
-int main(int argc, char *argv[])
+static int options(int argc, const char *argv[])
 {
-    /* create both target dirs up front; ignore EEXIST */
     if (MKDIR(HACK_DIR) == -1 && errno != EEXIST) { perror("mkdir HACK"); return 1; }
     if (MKDIR(HEX_DIR)  == -1 && errno != EEXIST) { perror("mkdir HEX");  return 1; }
 
@@ -106,4 +105,9 @@ int main(int argc, char *argv[])
 
     free(bin.str);
     return rc;
+}
+
+int main(int argc, const char *argv[])
+{
+    return options(argc, argv);
 }

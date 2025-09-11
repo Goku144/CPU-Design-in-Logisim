@@ -1663,3 +1663,5 @@ gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
 gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
 [Thu 09/11/2025  4:11:43.07]  
 gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
+[Thu 09/11/2025  4:32:51.24]  
+gcc -O2 -Wall -Wextra -std=c11 HackAssembler.c -lhacklib -o bin/HackAssembler
