@@ -7,7 +7,7 @@
 #ifdef _WIN32
   #include <direct.h>
   #define MKDIR(p) _mkdir(p)
-  #define HACK_DIR "..\\.HACK"              // no trailing slash
+  #define HACK_DIR "..\\.HACK"
   #define HEX_DIR  "..\\.HEX"
   #define HACK_FMT "..\\.HACK\\%s.hack"
   #define HEX_FMT  "..\\.HEX\\%s.hex"
@@ -49,7 +49,14 @@ static int options(int argc, const char *argv[])
     const char *out = argv[3];
 
     String bin = hackAssembler(in);
-    if (!bin.str) { fprintf(stderr, "hackAssembler failed\n"); return 1; }
+    if (!bin.str) { fprintf(stderr, "hackAssembler failed...\n"); return 1; }
+
+    // Finale step
+    FILE *fp = fopen("..\\.AssemblerSteps\\4-out.hack", "w");
+    if(!fp) {fprintf(stderr, "hackAssembler failed\n"); return 1;}
+    fwrite(bin.str, 1, bin.size - 1, fp);
+    fclose(fp);
+
     size_t bin_bytes = (bin.size ? bin.size - 1 : 0);
 
     int rc = 0;
