@@ -46,10 +46,43 @@ static const Pair preSymboles[] =
 
 static uint16_t var = 16;
 
+
+/********************************** Function Helpers **********************************/
+
 static int find_pos(const char *s, int ch) 
 {
     const char *p = strchr(s, ch);   // first occurrence
     return p ? (int)(p - s) : -1;
+}
+
+int isdigits(const char *string)
+{
+    if (!string || !*string) return -1;
+    if (!string) return -1;
+    errno = 0;
+    char *end;
+    unsigned long num = strtoul(string, &end, 10);
+
+    if (end == string) return -1;            // no digits
+    if (*end != '\0') return -1;            // trailing junk
+    if (errno == ERANGE) return -1;            // overflow
+    if (num > 65535UL) return -1;            // beyond uint16_t
+
+    return (int) num;
+}
+
+int isValideLabel(const char *string)
+{
+    if (!string || !*string) return 0;
+    // check leading char's
+    if(!((string[0] >= 'a' && string[0] <= 'z') || (string[0] >= 'A' && string[0] <= 'Z') || string[0] == '_' || string[0] == '.'  || string[0] == '$' || string[0] == ':'))
+        return 0;
+    for (size_t i = 1; string[i]; i++)
+    {
+        if(!((string[i] >= 'a' && string[i] <= 'z') || (string[i] >= 'A' && string[i] <= 'Z') || (string[i] >= '0' && string[i] <= '9') || string[i] == '_' || string[i] == '.'  || string[i] == '$' || string[i] == ':'))
+            return 0;
+    }
+    return 1;
 }
 
 /********************************** Data Structure **********************************/
@@ -346,36 +379,6 @@ String *extInstruction(String file)
 
 
     return buffer; 
-}
-
-int isdigits(const char *string)
-{
-    if (!string || !*string) return -1;
-    if (!string) return -1;
-    errno = 0;
-    char *end;
-    unsigned long num = strtoul(string, &end, 10);
-
-    if (end == string) return -1;            // no digits
-    if (*end != '\0') return -1;            // trailing junk
-    if (errno == ERANGE) return -1;            // overflow
-    if (num > 65535UL) return -1;            // beyond uint16_t
-
-    return (int) num;
-}
-
-int isValideLabel(const char *string)
-{
-    if (!string || !*string) return 0;
-    // check leading char's
-    if(!((string[0] >= 'a' && string[0] <= 'z') || (string[0] >= 'A' && string[0] <= 'Z') || string[0] == '_' || string[0] == '.'  || string[0] == '$' || string[0] == ':'))
-        return 0;
-    for (size_t i = 1; string[i]; i++)
-    {
-        if(!((string[i] >= 'a' && string[i] <= 'z') || (string[i] >= 'A' && string[i] <= 'Z') || (string[i] >= '0' && string[i] <= '9') || string[i] == '_' || string[i] == '.'  || string[i] == '$' || string[i] == ':'))
-            return 0;
-    }
-    return 1;
 }
 
 String *extLabel(String *file, LinkedList *list)
