@@ -24,7 +24,7 @@ HackAssembler <input.asm> ([-o <name>] | [-h <name>] | [-b <name>])
 ## Examples
 
 ```bat
-cd .\Software\Compiler
+cd .\Software\Assembler
 
 :: Assemble Pong to HACK (.hack text)
 .\bin\HackAssembler ..\.ASM\Pong.asm -o Pong

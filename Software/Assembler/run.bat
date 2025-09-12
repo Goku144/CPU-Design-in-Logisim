@@ -1,0 +1,1 @@
+echo [%DATE% %TIME%] >> log\HackComp.log && make >> log/HackComp.log
