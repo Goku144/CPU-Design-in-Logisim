@@ -1,1 +1,0 @@
-echo [%DATE% %TIME%] >> log\Hacklib.log && make clean && make >> log\Hacklib.log && make install PREFIX=/mingw64 && make clean

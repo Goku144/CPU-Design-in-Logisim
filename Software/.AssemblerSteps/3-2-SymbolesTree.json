@@ -21,5 +21,8 @@
   {"Symbole":"LCL","value":1},
   {"Symbole":"ARG","value":2},
   {"Symbole":"THIS","value":3},
-  {"Symbole":"THAT","value":4}
+  {"Symbole":"THAT","value":4},
+  {"Symbole":"loop","value":2},
+  {"Symbole":"END","value":12},
+  {"Symbole":"var0","value":16}
 ]

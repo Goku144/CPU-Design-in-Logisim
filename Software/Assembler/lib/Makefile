@@ -1,77 +1,94 @@
-# ---- project ----
-NAME    := hacklib
-SRC     := Hacklib.c
-HDR     := Hacklib.h
-OBJ     := $(SRC:.c=.o)
+# ===== MSYS2 / MinGW Makefile: shared library from mylib.c =====
+# Build:      make
+# Install:    make install
+# Uninstall:  make uninstall
+# Debug dirs: make print-dirs
 
+# ---- Source & names (safe defaults) ----
+SRC   ?= Hacklib.c
+SNAME := $(basename $(notdir $(SRC)))
+HDR   ?= $(SNAME).h
+
+# Sanity checks (helpful error messages)
+ifeq ($(strip $(wildcard $(SRC))),)
+  $(error $(SRC) not found next to this Makefile)
+endif
+ifeq ($(strip $(wildcard $(HDR))),)
+  $(error $(HDR) not found next to this Makefile)
+endif
+
+LIBBASE := lib$(SNAME)
+DLL     := $(LIBBASE).dll
+IMPLIB  := $(LIBBASE).dll.a
+OBJ     := $(SNAME).o
+
+# ---- Toolchain & flags ----
 CC      ?= gcc
-CFLAGS  ?= -O2 -Wall -Wextra -std=c11 -fPIC
-LDFLAGS ?=
-PREFIX  ?= /mingw64          # MSYS2 MinGW shell default; override if needed
+CFLAGS  ?= -O2 -Wall -Wextra -DWIN32_LEAN_AND_MEAN -DBUILDING_$(SNAME)_DLL
+# If your header uses __declspec(dllexport) on BUILDING_$(SNAME)_DLL, you may drop --export-all-symbols.
+LDFLAGS ?= -shared -Wl,--out-implib,$(IMPLIB) -Wl,--export-all-symbols
 
-# ---- OS detect ----
-UNAME_S := $(shell uname -s)
-ifeq ($(findstring MINGW,$(UNAME_S)),MINGW)
-  OS := windows
-endif
-ifeq ($(findstring MSYS,$(UNAME_S)),MSYS)
-  OS := windows
-endif
-ifeq ($(UNAME_S),Darwin)
-  OS := mac
-endif
-OS ?= unix
-
-# ---- per-OS shared lib ----
-ifeq ($(OS),windows)
-  SHARED     := lib$(NAME).dll
-  IMPORTLIB  := lib$(NAME).dll.a
-  LDFLAGS   += -shared -Wl,--out-implib,$(IMPORTLIB)
-  INCDIR     := $(PREFIX)/include
-  LIBDIR     := $(PREFIX)/lib
-  BINDIR     := $(PREFIX)/bin
-else ifeq ($(OS),mac)
-  SHARED     := lib$(NAME).dylib
-  LDFLAGS   += -dynamiclib -Wl,-install_name,@rpath/$(SHARED)
-  INCDIR     := $(PREFIX)/include
-  LIBDIR     := $(PREFIX)/lib
-  BINDIR     := $(PREFIX)/bin
-else
-  SHARED     := lib$(NAME).so
-  LDFLAGS   += -shared
-  INCDIR     := $(PREFIX)/include
-  LIBDIR     := $(PREFIX)/lib
-  BINDIR     := $(PREFIX)/bin
+# ---- Where to install (detect MSYS2 prefix, fall back if in PowerShell) ----
+PREFIX ?= $(MINGW_PREFIX)
+ifeq ($(PREFIX),)
+  ifeq ($(MSYSTEM),MINGW64)
+    PREFIX := /mingw64
+  else ifeq ($(MSYSTEM),UCRT64)
+    PREFIX := /ucrt64
+  else ifeq ($(MSYSTEM),CLANG64)
+    PREFIX := /clang64
+  else ifeq ($(MSYSTEM),MINGW32)
+    PREFIX := /mingw32
+  else
+    # Fallback for cmd/PowerShell users:
+    ifneq ($(wildcard C:/msys64/mingw64),)
+      PREFIX := C:/msys64/mingw64
+    else
+      PREFIX := /mingw64
+    endif
+  endif
 endif
 
-.PHONY: all clean install uninstall
+INCDIR := $(PREFIX)/include
+LIBDIR := $(PREFIX)/lib
+BINDIR := $(PREFIX)/bin
 
-all: $(SHARED)
+RM        := rm -f
+INSTALL   := install
+MKDIR_P   := install -d
+
+.PHONY: all clean install uninstall print-dirs
+all: $(DLL)
 
 $(OBJ): $(SRC) $(HDR)
-	$(CC) $(CFLAGS) -I. -c $(SRC) -o $(OBJ)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(SHARED): $(OBJ)
-	$(CC) $(OBJ) $(LDFLAGS) -o $(SHARED)
-
-install: all
-	install -d "$(INCDIR)" "$(LIBDIR)" "$(BINDIR)"
-	install -m 644 $(HDR) "$(INCDIR)/"
-ifeq ($(OS),windows)
-	install -m 755 $(SHARED) "$(BINDIR)/"
-	@if [ -f "$(IMPORTLIB)" ]; then install -m 644 "$(IMPORTLIB)" "$(LIBDIR)/"; fi
-else
-	install -m 755 $(SHARED) "$(LIBDIR)/"
-endif
-	@echo "Installed: $(HDR)->$(INCDIR), $(SHARED)->$(if $(filter windows,$(OS)),$(BINDIR),$(LIBDIR))"
-
-uninstall:
-	@rm -f "$(INCDIR)/$(HDR)"
-ifeq ($(OS),windows)
-	@rm -f "$(BINDIR)/$(SHARED)" "$(LIBDIR)/lib$(NAME).dll.a"
-else
-	@rm -f "$(LIBDIR)/$(SHARED)"
-endif
+$(DLL): $(OBJ)
+	$(CC) $(OBJ) $(LDFLAGS) -o $@
 
 clean:
-	@rm -f $(OBJ) $(SHARED) $(IMPORTLIB)
+	-$(RM) $(OBJ) $(DLL) $(IMPLIB)
+
+install: all
+	$(MKDIR_P) "$(INCDIR)" "$(LIBDIR)" "$(BINDIR)"
+	$(INSTALL) -m644 "$(HDR)"    "$(INCDIR)/$(notdir $(HDR))"
+	$(INSTALL) -m644 "$(IMPLIB)" "$(LIBDIR)/$(notdir $(IMPLIB))"
+	$(INSTALL) -m755 "$(DLL)"    "$(BINDIR)/$(notdir $(DLL))"
+	@echo "Installed:"
+	@echo "  Header     -> $(INCDIR)/$(notdir $(HDR))"
+	@echo "  Import lib -> $(LIBDIR)/$(notdir $(IMPLIB))"
+	@echo "  DLL        -> $(BINDIR)/$(notdir $(DLL))"
+
+uninstall:
+	-$(RM) "$(INCDIR)/$(notdir $(HDR))" \
+	       "$(LIBDIR)/$(notdir $(IMPLIB))" \
+	       "$(BINDIR)/$(notdir $(DLL))"
+	@echo "Uninstalled files for $(SNAME) from $(PREFIX)."
+
+print-dirs:
+	@echo MSYSTEM=$(MSYSTEM)
+	@echo MINGW_PREFIX=$(MINGW_PREFIX)
+	@echo PREFIX=$(PREFIX)
+	@echo INCDIR=$(INCDIR)
+	@echo LIBDIR=$(LIBDIR)
+	@echo BINDIR=$(BINDIR)

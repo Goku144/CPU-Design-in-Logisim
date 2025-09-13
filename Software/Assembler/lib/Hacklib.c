@@ -686,10 +686,10 @@ char *Cinstruction(String line, const size_t numline)
     {
         comp = line.str;
     }
-    if ((pos = find_pos(line.str, ';')) != -1)
+    if ((pos = find_pos(comp, ';')) != -1)
     {
-        jmp = line.str + pos + 1;
-        line.str[pos] = '\0';
+        jmp = comp + pos + 1;
+        comp[pos] = '\0';
     }
 
     int compindx = 0;

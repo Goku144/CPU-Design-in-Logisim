@@ -1,11 +1,11 @@
 # How to Run the Hack Assembler (Windows)
 
-**Binary:** `Software/Compiler/bin/HackAssembler.exe`
+**Binary:** `Software/Assembler/bin/hasm.exe`
 
 ## CLI
 
 ```text
-HackAssembler <input.asm> ([-o <name>] | [-h <name>] | [-b <name>])
+hasm <input.asm> ([-o <name>] | [-h <name>] | [-b <name>])
 ```
 
 ### Options
@@ -52,5 +52,5 @@ cd .\Software\Assembler
   Use `-o Pong` instead.
 
 * **Old (deprecated) usage**
-  Previous docs showed: `HackAssembler <input.asm> <output.hack>`
+  Previous docs showed: `hasm <input.asm> <output.hack>`
   Now you must use one of `-o`, `-h`, or `-b` as above.
